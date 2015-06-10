@@ -28,7 +28,7 @@ b.关闭socket后， receive_handle会理解返回，并进入error分支.
 c.error分支分支处理on_error
 d.在game_client.on_error中进行simulate_receive.BYE，将离开通知逻辑处理
 e.on_error处理完后，delete this.
-hello,client;
+
 */
 
 #include <cstdarg>
