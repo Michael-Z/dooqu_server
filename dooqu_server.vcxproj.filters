@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\net">
+      <UniqueIdentifier>{bde991e9-ffcb-4101-80f9-1ebbff90e3dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\net">
+      <UniqueIdentifier>{8d2231b2-8d1f-4a7b-9f63-28c280b387d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\service">
+      <UniqueIdentifier>{cc17ff38-7aa6-4a6c-90e8-ca44a7093542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\service">
+      <UniqueIdentifier>{5371e828-73fa-4091-92bf-0e65ea10e46b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\ddz">
+      <UniqueIdentifier>{ee19f6d8-b56f-4497-aa89-39164156f769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ddz">
+      <UniqueIdentifier>{7ced1f72-7cfa-4fe0-b0cc-e89e68e479ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\plane">
+      <UniqueIdentifier>{ada7d577-621d-440e-b139-26b563b0c662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\plane">
+      <UniqueIdentifier>{629f1e42-6547-4b4a-972c-8e805fe6909f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\net\tcp_client.h">
+      <Filter>头文件\net</Filter>
+    </ClInclude>
+    <ClInclude Include="src\net\tcp_server.h">
+      <Filter>头文件\net</Filter>
+    </ClInclude>
+    <ClInclude Include="src\net\service_error.h">
+      <Filter>头文件\net</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\game_client.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\service_error.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\game_info.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\game_service.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\game_plugin.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\command_dispatcher.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\command.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\char_key_op.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\utility.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\game_zone.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\post_monitor.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\ddz_plugin.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\ddz_game_info.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\ddz_desk.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\poker_info.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\poker_parser.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\service_error.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\http_request.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ddz\poker_finder.h">
+      <Filter>头文件\ddz</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\tick_count.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+    <ClInclude Include="src\plane\plane_desk.h">
+      <Filter>头文件\plane</Filter>
+    </ClInclude>
+    <ClInclude Include="src\plane\plane_plugin.h">
+      <Filter>头文件\plane</Filter>
+    </ClInclude>
+    <ClInclude Include="src\plane\plane_game_info.h">
+      <Filter>头文件\plane</Filter>
+    </ClInclude>
+    <ClInclude Include="src\plane\service_error.h">
+      <Filter>头文件\plane</Filter>
+    </ClInclude>
+    <ClInclude Include="src\service\ip_monitor.h">
+      <Filter>头文件\service</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\net\tcp_client.cpp">
+      <Filter>源文件\net</Filter>
+    </ClCompile>
+    <ClCompile Include="src\net\tcp_server.cpp">
+      <Filter>源文件\net</Filter>
+    </ClCompile>
+    <ClCompile Include="src\service\game_client.cpp">
+      <Filter>源文件\service</Filter>
+    </ClCompile>
+    <ClCompile Include="src\service\command.cpp">
+      <Filter>源文件\service</Filter>
+    </ClCompile>
+    <ClCompile Include="src\service\command_dispatcher.cpp">
+      <Filter>源文件\service</Filter>
+    </ClCompile>
+    <ClCompile Include="src\service\game_plugin.cpp">
+      <Filter>源文件\service</Filter>
+    </ClCompile>
+    <ClCompile Include="src\service\game_zone.cpp">
+      <Filter>源文件\service</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddz\ddz_plugin.cpp">
+      <Filter>源文件\ddz</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddz\poker_parser.cpp">
+      <Filter>源文件\ddz</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddz\ddz_desk.cpp">
+      <Filter>源文件\ddz</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddz\ddz_game_info.cpp">
+      <Filter>源文件\ddz</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddz\poker_finder.cpp">
+      <Filter>源文件\ddz</Filter>
+    </ClCompile>
+    <ClCompile Include="src\plane\plane_plugin.cpp">
+      <Filter>源文件\plane</Filter>
+    </ClCompile>
+    <ClCompile Include="src\plane\plane_game_info.cpp">
+      <Filter>源文件\plane</Filter>
+    </ClCompile>
+    <ClCompile Include="src\service\game_service.cpp">
+      <Filter>源文件\service</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="config.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+  </ItemGroup>
+</Project>

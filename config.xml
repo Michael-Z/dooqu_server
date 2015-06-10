@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<server>
+  <config>
+    <ip_addr>127.0.0.1</ip_addr>
+    <port>8080</port>
+    <auth_host>127.0.0.1/</auth_host>
+    <auth_path>/auth.xml</auth_path>
+    <login_timeout>10000</login_timeout>
+    <active_timeout>30000</active_timeout>
+    <command_buffer></command_buffer>
+    <login_cen
+  </config>
+  <games>
+    
+  </games>
+</server>
