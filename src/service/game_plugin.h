@@ -50,7 +50,7 @@ namespace dooqu_server
 			virtual int on_befor_client_join(game_client* client);
 			virtual void on_client_join(game_client* client);
 			virtual void on_client_leave(game_client* client, int code);
-			inline virtual void on_command(game_client* client, command* command);
+			inline virtual void on_client_command(game_client* client, command* command);
 			virtual game_zone* on_create_zone(char* zone_id);
 			virtual void on_update_timeout_clients();
 			

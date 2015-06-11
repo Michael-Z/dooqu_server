@@ -22,6 +22,8 @@ namespace dooqu_server
 		{
 			friend class game_service;
 			friend class game_plugin;
+			friend class command_dispatcher;
+
 		private:
 			int error_code_;
 
@@ -37,7 +39,7 @@ namespace dooqu_server
 			post_monitor message_monitor_;
 			post_monitor active_monitor_;
 
-			inline virtual void on_command(command* command);
+			//inline virtual void on_command(command* command);
 			inline virtual void on_data(char* data);
 			virtual void on_error(const int error);
 

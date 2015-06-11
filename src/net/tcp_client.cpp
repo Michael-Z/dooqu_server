@@ -206,7 +206,7 @@ namespace dooqu_server
 				{
 					printf("client.receive canceled:{%s}\n", error.message().c_str());
 					this->available_ = false;
-					this->on_error(0);
+					this->on_error(service_error::CLIENT_NET_ERROR);
 
 					return;
 				}

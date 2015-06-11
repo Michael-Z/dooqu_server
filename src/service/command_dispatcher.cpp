@@ -24,25 +24,41 @@ namespace dooqu_server
 		}
 
 
-		bool command_dispatcher::action(game_client* client, command* cmd)
-		{
-			if (client->can_active() == false)
-			{
-				client->disconnect(service_error::CONSTANT_REQUEST);
-				return false;
-			}
+		//bool command_dispatcher::action(game_client* client, command* cmd)
+		//{
+		//	if (client->can_active() == false)
+		//	{
+		//		client->disconnect(service_error::CONSTANT_REQUEST);
+		//		return false;
+		//	}
 
-			if (cmd != NULL && cmd->is_correct())
+		//	if (cmd != NULL && cmd->is_correct())
+		//	{
+		//		client->active();
+		//		this->on_command(client, cmd);
+		//		return true;
+		//	}
+		//	return false;
+		//}
+
+		bool command_dispatcher::action(game_client* client, char* data)
+		{
+			this->on_client_data(client, data);
+			return true;
+		}
+
+		void command_dispatcher::on_client_data(game_client* client, char* data)
+		{
+			client->commander_.reset(data);
+
+			if (client->commander_.is_correct())
 			{
-				client->active();
-				this->on_command(client, cmd);
-				return true;
+				this->on_client_command(client, &client->commander_);
 			}
-			return false;
 		}
 
 
-		void command_dispatcher::on_command(game_client* client, command* command)
+		void command_dispatcher::on_client_command(game_client* client, command* command)
 		{
 			std::map<char*, command_handler, pchar_key_cmp>::iterator handle_pair = this->handles.find(command->name());
 
@@ -52,6 +68,17 @@ namespace dooqu_server
 				(this->**handle)(client, command);
 			}
 		}
+
+		//void command_dispatcher::on_command(game_client* client, command* command)
+		//{
+		//	std::map<char*, command_handler, pchar_key_cmp>::iterator handle_pair = this->handles.find(command->name());
+
+		//	if (handle_pair != this->handles.end())
+		//	{
+		//		command_handler* handle = &handle_pair->second;
+		//		(this->**handle)(client, command);
+		//	}
+		//}
 
 
 		void command_dispatcher::unregist(char* cmd_name)

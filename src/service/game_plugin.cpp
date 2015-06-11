@@ -139,20 +139,21 @@ namespace dooqu_server
 		}
 
 
-		void game_plugin::on_command(game_client* client, command* command)
+		void game_plugin::on_client_command(game_client* client, command* command)
 		{
-			if (this->game_service_->is_running())
+			if (this->game_service_->is_running() == false)
+				return;
+
+			command_dispatcher::on_client_command(client, command);
+
 			{
-				command_dispatcher::on_command(client, command);
+				using namespace dooqu_server::net;
+
+				thread_status_map::iterator curr_thread_pair = this->game_service_->threads_status()->find(boost::this_thread::get_id());
+
+				if (curr_thread_pair != this->game_service_->threads_status()->end())
 				{
-					using namespace dooqu_server::net;
-
-					thread_status_map::iterator curr_thread_pair = this->game_service_->threads_status()->find(boost::this_thread::get_id());
-
-					if (curr_thread_pair != this->game_service_->threads_status()->end())
-					{
-						curr_thread_pair->second->restart();
-					}
+					curr_thread_pair->second->restart();
 				}
 			}
 		}

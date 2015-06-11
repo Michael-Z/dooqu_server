@@ -27,20 +27,35 @@ namespace dooqu_server
 		{
 			printf("game_client{%s}.on_data:{%s}\n", this->id(), data);
 			//上锁，保证用户的命令是串行的
+			//simulate_on_command 可能会并发冲突；
 			boost::recursive_mutex::scoped_lock lock(this->commander_mutex_);
 
-			this->commander_.reset(data);
+			//this->commander_.reset(data);
 
-			if (this->commander_.is_correct())
-			{
-				this->on_command(&this->commander_);
-			}
+			//if (this->commander_.is_correct())
+			//{
+			//	this->on_command(&this->commander_);
+			//}
+
+			this->cmd_dispatcher_->action(this, data);
 		}
+
+
+		//void game_client::on_command(command* command)
+		//{
+		//	if (this->cmd_dispatcher_ != NULL)
+		//	{
+		//		this->cmd_dispatcher_->action(this, command);
+		//	}
+		//}
 
 		//on_error的主要功能是将用户的离开和逻辑错误动作传递给command_dispatcher对象进行依次处理。
 		void game_client::on_error(const int error)
 		{
-			if (this->error_code_ == 0)
+			//error_code_的初始默认值为0、即CLIENT_NET_ERROR；
+			//如果这个值被改动，说明在on_error之前、调用过disconnect、并传递过断开的原因；
+			//这样在tcp_client的断开处理中、即使传递0，也不会被赋值；
+			if (this->error_code_ == service_error::CLIENT_NET_ERROR)
 			{
 				this->error_code_ = error;
 			}
@@ -54,13 +69,7 @@ namespace dooqu_server
 		}
 
 
-		void game_client::on_command(command* command)
-		{
-			if (this->cmd_dispatcher_ != NULL)
-			{
-				this->cmd_dispatcher_->action(this, command);
-			}
-		}
+
 
 
 		void game_client::fill(char* id, char* name, char* profile)
@@ -99,11 +108,12 @@ namespace dooqu_server
 			//加锁
 			boost::recursive_mutex::scoped_lock lock(this->commander_mutex_);
 
-			this->commander_.reset(command_data_clone);
-			if (this->commander_.is_correct())
-			{
-				this->on_command(&this->commander_);
-			}
+			this->on_data(command_data_clone);
+			//this->commander_.reset(command_data_clone);
+			//if (this->commander_.is_correct())
+			//{
+			//	this->on_command(&this->commander_);
+			//}
 
 			if (is_const_string)
 			{
