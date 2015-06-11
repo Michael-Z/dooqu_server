@@ -139,12 +139,16 @@ namespace dooqu_server
 
 		void game_service::on_client_command(game_client* client, command* command)
 		{
-			bool client_can_actived = client->can_active();
+			if (this->is_running_ == false)
+				return;
 
-			if (this->is_running_)
+			if (client->can_active() == false)
 			{
-				command_dispatcher::on_client_command(client, command);
+				client->disconnect(service_error::CONSTANT_REQUEST);
+				return;
 			}
+
+			command_dispatcher::on_client_command(client, command);
 		}
 
 

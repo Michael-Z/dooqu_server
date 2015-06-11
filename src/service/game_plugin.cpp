@@ -123,7 +123,7 @@ namespace dooqu_server
 
 		void game_plugin::on_client_leave(game_client* client, int code)
 		{
-			printf("{%s} leave game_plugin. code={%d}.\n", client->name(), code);
+			printf("{%s} leave plugin. ret={%d}.\n", client->name(), code);
 		}
 
 
@@ -143,6 +143,12 @@ namespace dooqu_server
 		{
 			if (this->game_service_->is_running() == false)
 				return;
+
+			if (client->active_monitor_.can_active() == false)
+			{
+				client->disconnect(service_error::CONSTANT_REQUEST);
+				return;
+			}
 
 			command_dispatcher::on_client_command(client, command);
 
