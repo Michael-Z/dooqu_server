@@ -286,7 +286,7 @@ namespace dooqu_server
 			}
 
 			//如果需要不请求http server请拿掉此注释
-			
+
 
 			//分配http_request的对象内存
 			//void* request_mem = this->on_create_http_request();
