@@ -65,6 +65,7 @@ namespace dooqu_server
 			virtual void on_robot_card(ddz_desk*, game_client*, int);
 
 			virtual void on_game_stop(ddz_desk* desk, game_client* client, bool normal);
+			virtual bool need_update_offline_client(game_client*, string&, string&);
 
 			//client handle
 			virtual void on_join_desk_handle(game_client*, command*);

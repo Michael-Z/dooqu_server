@@ -270,7 +270,7 @@ namespace dooqu_server
 
 			string server_url, path_url;
 
-			if (this->get_offline_update_url(client, server_url, path_url))
+			if (this->need_update_offline_client(client, server_url, path_url))
 			{
 				this->begin_update_client(client, server_url, path_url);
 			}
@@ -339,7 +339,7 @@ namespace dooqu_server
 
 		//如果当game_client离开game_plugin需要调用http协议的外部地址来更新更新game_client的状态；
 		//那么请在此函数返回true，并且正确的赋值server_url和request_path的值；
-		bool game_plugin::get_offline_update_url(game_client* client, string& server_url, string& request_path)
+		bool game_plugin::need_update_offline_client(game_client* client, string& server_url, string& request_path)
 		{
 			return false;
 			server_url = "127.0.0.1";
@@ -351,7 +351,6 @@ namespace dooqu_server
 		//如果get_offline_update_url返回true，请重写on_update_offline_client，并根据error_code的值来确定update操作的返回值。
 		void game_plugin::on_update_offline_client(const boost::system::error_code& err, const int status_code, game_client* client)
 		{
-
 		}
 
 

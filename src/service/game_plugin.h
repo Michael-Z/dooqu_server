@@ -18,6 +18,17 @@ namespace dooqu_server
 	{
 		class game_service;
 
+		//集成继承抽象类game_plugin，可以创建一个游戏逻辑插件；
+		//通过重写game_plugin的事件函数，可实现控制游戏的基本流程；
+		//可重写的事件包括:
+		//on_load,游戏加载时候调用
+		//on_unload，游戏卸载的时候调用
+		//on_update，游戏更新的时候调用
+		//on_auth_client，在通过以http形式访问鉴权地址后的回调事件函数，http的返回结果会作为参数传递过来；
+		//on_befor_client_join，在一个client加入游戏插件之前调用，通过重写该函数可由返回值决定该玩家是否可以加入游戏；
+		//on_client_join， 在玩家加入游戏后调用，可在此处理一些初始化的逻辑；
+		//on_client_leave，在玩家离开游戏后调用，可在此处理一些清理的逻辑
+		//get_offline_update_url，通过重写该时间，传递返回值true，来决定是否在用户离开后，http形式更新用户数据
 		class game_plugin : public command_dispatcher, boost::noncopyable
 		{
 			typedef std::map<char*, game_client*, char_key_op> game_client_map;
@@ -43,19 +54,29 @@ namespace dooqu_server
 			boost::asio::deadline_timer update_timer_;
 
 			virtual void on_load();
+
 			virtual void on_unload();
+
 			virtual void on_update();
+
 			virtual void on_run();
+
 			virtual int on_auth_client(game_client* client, const std::string&);
+
 			virtual int on_befor_client_join(game_client* client);
+
 			virtual void on_client_join(game_client* client);
+
 			virtual void on_client_leave(game_client* client, int code);
+
 			inline virtual void on_client_command(game_client* client, command* command);
+
 			virtual game_zone* on_create_zone(char* zone_id);
+
 			virtual void on_update_timeout_clients();
 			
 			//如果get_offline_update_url返回true，请重写on_update_offline_client，并根据error_code的值来确定update操作的返回值。
-			virtual bool get_offline_update_url(game_client* client, string& server_url, string& request_path);
+			virtual bool need_update_offline_client(game_client* client, string& server_url, string& request_path);
 			
 			//如果当game_client离开game_plugin需要调用http协议的外部地址来更新更新game_client的状态；
 			//那么请在此函数返回true，并且正确的赋值server_url和request_path的值；

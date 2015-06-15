@@ -54,22 +54,22 @@ int main(int argc, char* argv[])
 	{
 		dooqu_server::service::game_service service(8000);
 
-		for (int i = 0; i < 2; i++)
-		{
-			char curr_game_id[30] = { 0 };
-			curr_game_id[sprintf(curr_game_id, "plane_%d", i)] = 0;
+		//for (int i = 0; i < 2; i++)
+		//{
+		//	char curr_game_id[30] = { 0 };
+		//	curr_game_id[sprintf(curr_game_id, "plane_%d", i)] = 0;
 
-			char curr_game_title[60] = { 0 };
-			curr_game_title[sprintf(curr_game_title, "飞机大战房间[%d]", i)] = 0;
+		//	char curr_game_title[60] = { 0 };
+		//	curr_game_title[sprintf(curr_game_title, "飞机大战房间[%d]", i)] = 0;
 
-			char curr_zone_id[30] = "zone_0";
+		//	char curr_zone_id[30] = "zone_0";
 
-			dooqu_server::plane::plane_plugin* plane_game = new dooqu_server::plane::plane_plugin(&service, curr_game_id, curr_game_title);
+		//	dooqu_server::plane::plane_plugin* plane_game = new dooqu_server::plane::plane_plugin(&service, curr_game_id, curr_game_title);
 
-			service.create_plugin(plane_game, curr_zone_id);
-		}
+		//	service.create_plugin(plane_game, curr_zone_id);
+		//}
 
-		for (int i = 0, j = 0, zone_id = 0; i < 1; i++)
+		for (int i = 0, j = 0, zone_id = 0; i < 5; i++)
 		{
 			char curr_game_id[30];
 			curr_game_id[sprintf(curr_game_id, "ddz_%d", i) + 1] = 0;

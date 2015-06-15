@@ -1504,5 +1504,12 @@ namespace dooqu_server
 				this->on_client_leave_desk(client, desk, client->error_code());
 			}
 		}
+
+		bool ddz_plugin::need_update_offline_client(game_client*, string& serverURL, string& path)
+		{
+			serverURL = "127.0.0.1";
+			path = "/offline.aspx";
+			return true;
+		}
 	}
 }
