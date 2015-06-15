@@ -11,6 +11,7 @@ namespace dooqu_server
 			this->game_info_ = NULL;
 			this->cmd_dispatcher_ = NULL;
 			this->available_ = false;
+			this->retry_update_times_ = UP_RE_TIMES;
 			this->error_code_ = 0;
 			this->active();
 			this->message_monitor_.init(5, 4000);

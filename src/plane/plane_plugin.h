@@ -36,6 +36,9 @@ namespace dooqu_server
 			virtual void on_client_ready_handle(game_client* client, command* cmd);
 			virtual void on_client_attack_handle(game_client* client, command* cmd);
 			virtual void on_client_bye_handle(game_client* client, command* cmd);
+
+			bool get_offline_update_url(game_client* client, string& server_url, string& request_path);
+
 		public:
 			plane_plugin(game_service* service, char* game_id, char* game_title) : game_plugin(service, game_id, game_title, 2000)
 			{

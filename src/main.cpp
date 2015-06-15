@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 	enable_mem_leak_check();
 
 	{
-		dooqu_server::service::game_service service(8080);
+		dooqu_server::service::game_service service(8000);
 
 		for (int i = 0; i < 2; i++)
 		{

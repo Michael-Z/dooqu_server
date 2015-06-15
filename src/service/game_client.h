@@ -28,7 +28,7 @@ namespace dooqu_server
 			int error_code_;
 
 		protected:
-			enum{ID_LEN = 16, NAME_LEN = 32};
+			enum{ID_LEN = 16, NAME_LEN = 32, UP_RE_TIMES = 3};
 			game_info* game_info_;
 			char id_[ID_LEN];
 			char name_[NAME_LEN];
@@ -38,6 +38,7 @@ namespace dooqu_server
 			boost::recursive_mutex commander_mutex_;
 			post_monitor message_monitor_;
 			post_monitor active_monitor_;
+			int retry_update_times_;
 
 			//inline virtual void on_command(command* command);
 			inline virtual void on_data(char* data);

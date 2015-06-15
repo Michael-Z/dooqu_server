@@ -311,22 +311,29 @@ namespace dooqu_server
 			const int status_code,
 			const string& result, game_client* client, http_request* request)
 		{
-			if (!err)
+			this->game_service_->on_destroy_http_request(request);
+
+			//如果http请求成功、同时http的返回码是200
+			if (err == boost::asio::error::eof && status_code == 200)
 			{
-				printf("===>%s\n", result.c_str());
+				printf("http update client successed.\n");
+				this->on_update_offline_client(err, status_code, client);
 			}
 			else
 			{
-				printf("%s<===", err.message().c_str());
+				printf("http update client failed,retry...\n");
+				//如果http请求没有成功				
+				//利用game_zone再发起延时请求；
+				if (this->zone_ != NULL && --client->retry_update_times_ > 0)
+				{
+					this->zone_->queue_task(boost::bind(&game_plugin::remove_client, this, client), 3000);
+					return;
+				}
 			}
-
-			printf("callback threadid is: %d\n", boost::this_thread::get_id());
-
-			this->on_update_offline_client(err, status_code, client);
 
 			this->remove_client_from_plugin(client);
 
-			this->game_service_->on_destroy_http_request(request);
+			printf("callback threadid is: %d\n", boost::this_thread::get_id());
 		}
 
 

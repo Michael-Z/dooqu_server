@@ -571,5 +571,12 @@ namespace dooqu_server
 		{
 
 		}
+
+		bool plane_plugin::get_offline_update_url(game_client* client, string& server_url, string& request_path)
+		{
+			server_url = "127.0.0.1";
+			request_path = "/offline.aspx";
+			return true;
+		}
 	}
 }
