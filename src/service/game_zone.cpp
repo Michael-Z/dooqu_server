@@ -19,6 +19,7 @@ namespace dooqu_server
 			this->is_onlined_ = false;
 		}
 
+
 		void game_zone::load()
 		{
 			//状态锁
@@ -27,16 +28,11 @@ namespace dooqu_server
 			if (this->is_onlined_ == false)
 			{
 				this->is_onlined_ = true;
-				//初始化相关的线程资源
-				const int WORKER_THREAD_NUM = 1;
-				for (int i = 0; i < WORKER_THREAD_NUM; i++)
-				{
-
-				}
 
 				this->on_load();
 			}
 		}
+
 
 		void game_zone::unload()
 		{
@@ -47,6 +43,7 @@ namespace dooqu_server
 				{
 					this->is_onlined_ = false;
 
+					return;
 					{
 						boost::recursive_mutex::scoped_lock lock(this->working_timers_mutex_);
 
@@ -93,7 +90,7 @@ namespace dooqu_server
 			//状态锁
 			boost::recursive_mutex::scoped_lock lock(this->status_mutex_);
 
-			if (this->game_service_->is_running() && this->is_onlined_)
+			//if (this->game_service_->is_running() && this->is_onlined_)
 			{
 				//预备timer的指针，并尝试从timer对象池中取出一个空闲的timer进行使用
 				//########################################################
@@ -152,7 +149,8 @@ namespace dooqu_server
 			{
 				//先锁状态，看game_zone的状态，如果还在running，那么继续处理逻辑，否则处理timer
 				boost::recursive_mutex::scoped_lock lock(this->status_mutex_);
-				if (this->game_service_->is_running() && this->is_onlined_ == true)
+
+				//if (this->game_service_->is_running() && this->is_onlined_ == true)
 				{
 					//#######此处代码处理用完的timer，返还给队列池##########
 					//#################################################
@@ -219,23 +217,26 @@ namespace dooqu_server
 					pos_timer != this->working_timers_.end();
 					++pos_timer)
 				{
-					//(*pos_timer)->cancel();
+					(*pos_timer)->cancel();
 					(*pos_timer)->~timer();
 					boost::singleton_pool<timer, sizeof(timer)>::free(*pos_timer);
 				}
 				this->working_timers_.clear();
 			}
 
+
 			{
-				boost::recursive_mutex::scoped_lock lock(this->free_timers_mutex_);
-				for (int i = 0; i < this->free_timers_.size(); ++i)
-				{
-					//this->free_timers_.at(i)->cancel();
-					this->free_timers_.at(i)->~timer();
-					boost::singleton_pool<timer, sizeof(timer)>::free(this->free_timers_.at(i));
-				}
-				this->free_timers_.clear();
+			boost::recursive_mutex::scoped_lock lock(this->free_timers_mutex_);
+
+			for (int i = 0; i < this->free_timers_.size(); ++i)
+			{
+				this->free_timers_.at(i)->cancel();
+				this->free_timers_.at(i)->~timer();
+				boost::singleton_pool<timer, sizeof(timer)>::free(this->free_timers_.at(i));
 			}
+
+			this->free_timers_.clear();
+		}
 
 			delete[] this->id_;
 		}

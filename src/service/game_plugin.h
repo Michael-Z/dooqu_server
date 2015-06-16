@@ -28,7 +28,7 @@ namespace dooqu_server
 		//on_befor_client_join，在一个client加入游戏插件之前调用，通过重写该函数可由返回值决定该玩家是否可以加入游戏；
 		//on_client_join， 在玩家加入游戏后调用，可在此处理一些初始化的逻辑；
 		//on_client_leave，在玩家离开游戏后调用，可在此处理一些清理的逻辑
-		//get_offline_update_url，通过重写该时间，传递返回值true，来决定是否在用户离开后，http形式更新用户数据
+		//need_update_offline_client，通过重写该时间，传递返回值true，来决定是否在用户离开后，http形式更新用户数据
 		class game_plugin : public command_dispatcher, boost::noncopyable
 		{
 			typedef std::map<char*, game_client*, char_key_op> game_client_map;

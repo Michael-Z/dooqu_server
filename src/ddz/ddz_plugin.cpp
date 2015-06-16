@@ -1505,10 +1505,15 @@ namespace dooqu_server
 			}
 		}
 
-		bool ddz_plugin::need_update_offline_client(game_client*, string& serverURL, string& path)
+		bool ddz_plugin::need_update_offline_client(game_client* c, string& serverURL, string& path)
 		{
 			serverURL = "127.0.0.1";
-			path = "/offline.aspx";
+
+			char c_buf[64] = { 0 };
+
+			sprintf(c_buf, "/offline.aspx?id={%s}", c->id());
+
+			path = c_buf;
 			return true;
 		}
 	}
