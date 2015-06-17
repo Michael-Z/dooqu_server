@@ -29,9 +29,9 @@ namespace dooqu_server
 
 		protected:
 			std::map<char*, command_handler, pchar_key_cmp> handles;
-			//virtual void on_command(game_client* client, command* command);
-			virtual void on_client_data(game_client*, char* data);
-			virtual void on_client_command(game_client*, command* command);
+			virtual void on_client_data_received(const boost::system::error_code& err_code, game_client* client, int data_length);
+			virtual void on_client_data(game_client*, char* data) = 0;
+			virtual void on_client_command(game_client*, command* command) = 0;
 		public:
 
 			bool regist_handle(char* cmd_name, command_handler handler);

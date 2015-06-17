@@ -38,6 +38,7 @@ namespace dooqu_server
 			//	this->on_command(&this->commander_);
 			//}
 
+
 			this->cmd_dispatcher_->action(this, data);
 		}
 
