@@ -24,32 +24,31 @@ namespace dooqu_server
 			printf("game_client destroyed.\n");
 		}
 
-		void game_client::on_data(char* data)
+
+		void game_client::on_data_received(const boost::system::error_code& error, size_t bytes_received)
 		{
-			printf("game_client{%s}.on_data:{%s}\n", this->id(), data);
-			//上锁，保证用户的命令是串行的
-			//simulate_on_command 可能会并发冲突；
-			boost::recursive_mutex::scoped_lock lock(this->commander_mutex_);
+			{
+				//receive_handle要在工作者现成上执行；
+				//在其他工作者线程上，同一时间不肯定不会有receive_handle的调用，因为receive本质是一个串行的动作；
+				//但是! 可能因为逻辑需要、在其他工作者线程上调用disconnect函数，所以必须要同步status；
+				boost::recursive_mutex::scoped_lock lock(this->status_lock_);
 
-			//this->commander_.reset(data);
+				if (!error)
+				{
+					this->cmd_dispatcher_->action(this, bytes_received);
 
-			//if (this->commander_.is_correct())
-			//{
-			//	this->on_command(&this->commander_);
-			//}
+					tcp_client::on_data_received(error, bytes_received);
+				}
+				else
+				{
+					printf("client.receive canceled:{%s}\n", error.message().c_str());
+					this->available_ = false;
+					this->on_error(service_error::CLIENT_NET_ERROR);
+				}
 
-
-			this->cmd_dispatcher_->action(this, data);
+			}//end lock;
 		}
 
-
-		//void game_client::on_command(command* command)
-		//{
-		//	if (this->cmd_dispatcher_ != NULL)
-		//	{
-		//		this->cmd_dispatcher_->action(this, command);
-		//	}
-		//}
 
 		//on_error的主要功能是将用户的离开和逻辑错误动作传递给command_dispatcher对象进行依次处理。
 		void game_client::on_error(const int error)
@@ -69,9 +68,6 @@ namespace dooqu_server
 				this->cmd_dispatcher_->dispatch_bye(this);
 			}			
 		}
-
-
-
 
 
 		void game_client::fill(char* id, char* name, char* profile)
@@ -110,12 +106,7 @@ namespace dooqu_server
 			//加锁
 			boost::recursive_mutex::scoped_lock lock(this->commander_mutex_);
 
-			this->on_data(command_data_clone);
-			//this->commander_.reset(command_data_clone);
-			//if (this->commander_.is_correct())
-			//{
-			//	this->on_command(&this->commander_);
-			//}
+			this->cmd_dispatcher_->simulate_client_data(this, command_data_clone);
 
 			if (is_const_string)
 			{

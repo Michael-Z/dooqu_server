@@ -40,8 +40,7 @@ namespace dooqu_server
 			post_monitor active_monitor_;
 			int retry_update_times_;
 
-			//inline virtual void on_command(command* command);
-			inline virtual void on_data(char* data);
+			inline void on_data_received(const boost::system::error_code& error, size_t bytes_received);
 			virtual void on_error(const int error);
 
 			void fill(char* id, char* name, char* profile);
@@ -50,7 +49,7 @@ namespace dooqu_server
 			virtual ~game_client();
 			char* id(){ return this->id_;}
 			char* name(){ return this->name_;}
-			//void simulate_on_command(char* command_data);
+
 			void simulate_on_command(char* command_data, bool is_const_string);
 			void set_command_dispatcher(command_dispatcher* dispather);
 			inline void active(){this->actived_time.restart();}

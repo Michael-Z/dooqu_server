@@ -50,13 +50,15 @@ namespace dooqu_server
 
 		class tcp_client : boost::noncopyable
 		{
+		public:
+			enum{ MAX_BUFFER_SIZE = 65 };
 		protected:
 
 			boost::recursive_mutex status_lock_;
 
 
 			//接收数据缓冲区的大小
-			enum{ MAX_BUFFER_SIZE = 65 };
+			
 
 
 			//接收数据缓冲区
@@ -88,7 +90,7 @@ namespace dooqu_server
 
 
 			//用来接收数据的回调方法
-			void receive_handle(const boost::system::error_code& error, size_t bytes_received);
+			virtual void on_data_received(const boost::system::error_code& error, size_t bytes_received);
 
 
 			//发送数据的回调方法
@@ -96,7 +98,7 @@ namespace dooqu_server
 
 
 			//当有数据到达时会被调用，该方法为虚方法，由子类进行具体逻辑的处理和运用
-			inline virtual void on_data(char* client_data) = 0;
+			//inline virtual void on_data(char* client_data) = 0;
 
 
 			//当客户端出现规则错误时进行调用， 该方法为虚方法，由子类进行具体的逻辑的实现。
