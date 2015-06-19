@@ -24,6 +24,7 @@ namespace dooqu_server
 					return std::strcmp(c1, c2) < 0;
 				}
 			};
+
 		public:
 			typedef void (command_dispatcher::*command_handler)(game_client* client, command* cmd);
 
