@@ -60,8 +60,8 @@ namespace dooqu_server
 			void dispatch_bye(game_client* client);
 
 			//Ó¦ÓÃ²ã×¢²á
-			void on_client_login_handle(game_client* client, command* command);
-			void on_robot_login_handle(game_client* client, command* command);
+			void client_login_handle(game_client* client, command* command);
+			void robot_login_handle(game_client* client, command* command);
 
 		public:
 

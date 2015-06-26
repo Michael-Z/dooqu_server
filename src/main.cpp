@@ -49,6 +49,7 @@ inline void enable_mem_leak_check()
 
 int main(int argc, char* argv[])
 {
+
 	enable_mem_leak_check();
 
 	{

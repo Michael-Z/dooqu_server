@@ -35,9 +35,18 @@ namespace dooqu_server
 
 				if (!error)
 				{
-					this->cmd_dispatcher_->action(this, bytes_received);
+					if (this->cmd_dispatcher_ != NULL)
+					{
+						this->cmd_dispatcher_->action(this, bytes_received);
 
-					tcp_client::on_data_received(error, bytes_received);
+						tcp_client::on_data_received(error, bytes_received);
+					}
+#ifdef __DEBUG__
+					else
+					{
+						printf("game_client's cmd_dispatcher is NULL.\n");
+					}
+#endif
 				}
 				else
 				{

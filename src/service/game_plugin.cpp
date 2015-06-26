@@ -342,9 +342,6 @@ namespace dooqu_server
 		bool game_plugin::need_update_offline_client(game_client* client, string& server_url, string& request_path)
 		{
 			return false;
-			server_url = "127.0.0.1";
-			request_path = "/offline.aspx";
-			return true;
 		}
 
 

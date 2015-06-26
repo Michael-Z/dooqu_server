@@ -62,8 +62,8 @@ namespace dooqu_server
 
 		void game_service::on_init()
 		{
-			this->regist_handle("LOG", make_handler(game_service::on_client_login_handle));
-			this->regist_handle("RLG", make_handler(game_service::on_robot_login_handle));
+			this->regist_handle("LOG", make_handler(game_service::client_login_handle));
+			this->regist_handle("RLG", make_handler(game_service::robot_login_handle));
 
 			//加载所有的所有分区
 			for (game_zone_map::iterator curr_zone = this->zones_.begin();
@@ -377,7 +377,7 @@ namespace dooqu_server
 		}
 
 
-		void game_service::on_client_login_handle(game_client* client, command* command)
+		void game_service::client_login_handle(game_client* client, command* command)
 		{
 			if (command->param_size() != 2)
 			{
@@ -410,7 +410,7 @@ namespace dooqu_server
 		}
 
 
-		void game_service::on_robot_login_handle(game_client* client, command* command)
+		void game_service::robot_login_handle(game_client* client, command* command)
 		{
 		}
 
