@@ -70,8 +70,8 @@ namespace dooqu_server
 			game_plugin* create_plugin(game_plugin* game_plugin, char* zone_id);
 			game_plugin_map* get_plugins(){ return &this->plugins_; }
 
-			http_request* on_create_http_request();
-			void on_destroy_http_request(http_request*);
+			http_request* get_http_request();
+			void free_http_request(http_request*);
 
 			virtual ~game_service();
 

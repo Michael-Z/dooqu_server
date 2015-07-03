@@ -289,7 +289,7 @@ namespace dooqu_server
 
 
 			//分配http_request的对象内存
-			//void* request_mem = this->on_create_http_request();
+			//void* request_mem = this->get_http_request();
 
 			this->end_auth(boost::asio::error::eof, 200, std::string(), NULL, plugin, client);
 			//http_request* request = new(request_mem)http_request(this->get_io_service(),
@@ -346,11 +346,11 @@ namespace dooqu_server
 
 			} while (true);
 
-			//this->on_destroy_http_request(request);
+			//this->free_http_request(request);
 		}
 
 
-		http_request* game_service::on_create_http_request()
+		http_request* game_service::get_http_request()
 		{
 			boost::recursive_mutex::scoped_lock lock(this->http_request_mutex_);
 
@@ -361,7 +361,7 @@ namespace dooqu_server
 		}
 
 
-		void game_service::on_destroy_http_request(http_request* request)
+		void game_service::free_http_request(http_request* request)
 		{
 			{
 				boost::recursive_mutex::scoped_lock lock(this->http_request_mutex_);
@@ -454,7 +454,7 @@ namespace dooqu_server
 			{
 				//这里一定要注意写法，因为这里是边遍历、边删除
 				//pos_http_request++返回一个临时对象， 对临时对象删除，并自动向下指向
-				this->on_destroy_http_request((*pos_http_request++));
+				this->free_http_request((*pos_http_request++));
 			}
 
 			boost::singleton_pool<game_client, sizeof(game_client)>::purge_memory();

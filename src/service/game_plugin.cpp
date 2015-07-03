@@ -296,7 +296,7 @@ namespace dooqu_server
 					ios = &this->game_service_->get_io_service();
 				}
 
-				void* http_req_mem = this->game_service_->on_create_http_request();
+				void* http_req_mem = this->game_service_->get_http_request();
 
 				http_request* request = new(http_req_mem)http_request(
 					*ios,
@@ -311,7 +311,7 @@ namespace dooqu_server
 			const int status_code,
 			const string& result, game_client* client, http_request* request)
 		{
-			this->game_service_->on_destroy_http_request(request);
+			this->game_service_->free_http_request(request);
 
 			//如果http请求成功、同时http的返回码是200
 			if (err == boost::asio::error::eof && status_code == 200)
