@@ -32,6 +32,7 @@ e.on_error处理完后，delete this.
 */
 
 #include <cstdarg>
+#include <string>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -57,8 +58,16 @@ namespace dooqu_server
 			boost::recursive_mutex status_lock_;
 
 
-			//接收数据缓冲区的大小
-			
+			//发送数据缓冲区
+		
+			std::vector< std::vector<char> > send_buffer_sequence_;			
+			boost::mutex send_buffer_lock_;
+
+			//正在处理的位置，这个位置是发送函数正在读取的位置
+			int read_pos_;
+
+			//write_pos_永远指向该写入的位置
+			int write_pos_;
 
 
 			//接收数据缓冲区
@@ -104,6 +113,8 @@ namespace dooqu_server
 			//当客户端出现规则错误时进行调用， 该方法为虚方法，由子类进行具体的逻辑的实现。
 			virtual void on_error(const int error) = 0;
 
+			inline bool alloc_available_buffer(std::vector<char>** buffer_alloc);
+
 		public:
 			tcp_client(io_service& ios);
 
@@ -117,13 +128,13 @@ namespace dooqu_server
 			void write(char* data);
 
 
-			inline void write(bool asynchronized, char* data);
+			void write(const char* format, ...);
 
 
-			void write(bool asynchronized, ...);
+			void disconnect_when_io_end();
 
 
-			virtual void disconnect();
+			void disconnect();
 
 
 			virtual void disconnect(int error_code) = 0;
