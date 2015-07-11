@@ -10,10 +10,13 @@ namespace dooqu_server
 		long tcp_client::CURR_SEND_TOTAL = 0;
 
 		tcp_client::tcp_client(io_service& ios)
-			: ios(ios), t_socket(ios)
+			: ios(ios),
+			t_socket(ios),
+			send_buffer_sequence_(1, std::vector<char>(MAX_BUFFER_SIZE + 1, 0)),
+			read_pos_(-1), write_pos_(0),
+			buffer_pos(0)
 		{
 			this->p_buffer = &this->buffer[0];
-			this->buffer_pos = 0;
 			memset(this->buffer, 0, sizeof(this->buffer));
 		}
 
@@ -26,78 +29,183 @@ namespace dooqu_server
 			this->t_socket.async_read_some(boost::asio::buffer(this->p_buffer, tcp_client::MAX_BUFFER_SIZE - this->buffer_pos),
 				boost::bind(&tcp_client::on_data_received, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 		}
-		
+
+
+		bool tcp_client::alloc_available_buffer(std::vector<char>** buffer_alloc)
+		{
+			//如果当前的写入位置的指针指向存在一个可用的send_buffer，那么直接取这个集合；
+			if (write_pos_ < this->send_buffer_sequence_.size())
+			{
+				//得到当前的send_buffer
+				*buffer_alloc = &this->send_buffer_sequence_.at(this->write_pos_);
+				this->write_pos_++;
+
+				return true;
+			}
+			else
+			{
+				//如果指向的位置不存在，需要新申请对象；
+				//如果已经存在了超过16个对象，说明网络异常那么断开用户；不再新申请数据;
+				if (this->send_buffer_sequence_.size() > 16)
+				{
+					*buffer_alloc = NULL;
+					return false;
+				}
+
+				//将新申请的消息承载体推入队列
+				this->send_buffer_sequence_.push_back(std::vector<char>(MAX_BUFFER_SIZE + 1, 0));
+
+				//将写入指针指向下一个预置位置
+				this->write_pos_ = this->send_buffer_sequence_.size() - 1;
+
+				//得到当前的send_buffer/
+				*buffer_alloc = &this->send_buffer_sequence_.at(this->write_pos_);
+
+				this->write_pos_++;
+
+				return true;
+			}
+		}
 
 
 		void tcp_client::write(char* data)
 		{
-			//默认调用的是异步的写
-			this->write(true, data);
-		}
-
-
-
-		void tcp_client::write(bool asynchronized, char* data)
-		{
-
 			if (this->available() == false)
 				return;
 
-			int data_len = std::strlen(data) + 1;
+			//默认调用的是异步的写
+			this->write("%s", data);
+		}
 
-			if (asynchronized)
+
+		void tcp_client::write(const char* format, ...)
+		{
+			if (this->available() == false)
+				return;
+
+			boost::mutex::scoped_lock lock(this->send_buffer_lock_);
+
+			std::vector<char>* curr_buffer = NULL;
+
+			//获取可用的buffer;
+			bool ret = this->alloc_available_buffer(&curr_buffer);
+
+			if (ret == false)
 			{
-				//如果是异步的写， 使用全局的函数，保障所有数据在一次调用中都发送出去，内部可能会使用多次的write_some；
-				boost::asio::async_write(this->t_socket, boost::asio::buffer(data, data_len),
+				//this->available_ = false;
+
+				this->disconnect();
+				return;
+			}
+
+			//代码到这里 send_buffer已经获取到，下面准备向内填写数据;
+			size_t c_size = 0;
+			int try_count = 5;
+
+			do
+			{
+				if (try_count < 5)
+				{
+					curr_buffer->resize(curr_buffer->size() * 2, 0);
+				}
+
+				va_list arg_ptr;
+				va_start(arg_ptr, format);
+
+				c_size = vsnprintf(&*curr_buffer->begin(), curr_buffer->size(), format, arg_ptr);
+
+				va_end(arg_ptr);
+
+			} while (c_size == curr_buffer->size() && curr_buffer->at(curr_buffer->size() - 1) != 0 && try_count-- > 0);
+
+
+
+			//如果正在发送的索引为-1，说明空闲
+			if (read_pos_ == -1)
+			{
+				read_pos_++;
+
+				//只要read_pos_ == -1，说明write没有在处理任何数据，说明没有处于发送状态
+				boost::asio::async_write(this->t_socket, boost::asio::buffer(&*curr_buffer->begin(), c_size),
 					boost::bind(&tcp_client::send_handle, this, boost::asio::placeholders::error));
+			}
+		}
+
+
+		void tcp_client::disconnect_when_io_end()
+		{
+			if (this->available() == false)
+				return;
+
+			boost::mutex::scoped_lock lock(this->send_buffer_lock_);
+
+
+			if (this->read_pos_ != -1)
+			{
+				std::vector<char>* curr_buffer = NULL;
+
+				bool alloc_ret = this->alloc_available_buffer(&curr_buffer);
+
+				if (alloc_ret)
+				{
+					curr_buffer->clear();
+					curr_buffer->resize(0);
+					return;
+				}
+			}
+
+			this->disconnect();			
+		}
+
+
+		void tcp_client::send_handle(const boost::system::error_code& error)
+		{
+			if (error)
+			{
+				printf("send_handle error: %s\n", error.message());
+				return;
+			}
+
+			if (this->available() == false)
+			{
+				return;
+			}
+
+			boost::mutex::scoped_lock lock(this->send_buffer_lock_);
+
+			std::vector<char>* curr_buffer = NULL; &this->send_buffer_sequence_.at(this->read_pos_);
+
+			if (read_pos_ >= (write_pos_ - 1))
+			{
+				//全部处理完
+				read_pos_ = -1;
+				write_pos_ = 0;
+
+				while (this->send_buffer_sequence_.size() > 5)
+				{
+					this->send_buffer_sequence_.pop_back();
+				}
 			}
 			else
 			{
-				boost::system::error_code err_no;
-				//如果是同步的写， 使用全局的函数，保障所有数据在一次调用中都发送出去，内部可能会使用多次的write_some；
-				boost::asio::write(this->t_socket, boost::asio::buffer(data, data_len), err_no);
-			}
+				read_pos_++;
 
-			if (tcp_client::LOG_IO_DATA)
-			{
-				tcp_client::CURR_SEND_TOTAL += (long)data_len;
-			}
-		}
+				std::vector<char>* curr_buffer = &this->send_buffer_sequence_.at(this->read_pos_);
 
-
-
-		void tcp_client::write(bool asychronized, ...)
-		{
-			if (this->available() == false)
-				return;
-
-			const int buffer_size = 512;
-			char buffer[buffer_size] = { 0 };
-
-			char* argc = NULL;
-			va_list arg_ptr;
-			va_start(arg_ptr, asychronized);
-
-			int curr_pos = 0;
-			while ((argc = va_arg(arg_ptr, char*)) != NULL && curr_pos < (buffer_size - 2))
-			{
-				if (curr_pos != 0)
+				if (curr_buffer->size() == 0)
 				{
-					buffer[curr_pos++] = ' ';
+					this->disconnect();
+
+					return;
 				}
 
-				while (curr_pos < (buffer_size - 1) && *argc)
-				{
-					buffer[curr_pos++] = *argc++;
-				}
+				size_t bytes_to_send = std::strlen(&*curr_buffer->begin());
+
+				boost::asio::async_write(this->t_socket, boost::asio::buffer(&*curr_buffer->begin(), bytes_to_send),
+					boost::bind(&tcp_client::send_handle, this, boost::asio::placeholders::error));
+
 			}
-
-			va_end(arg_ptr);
-			buffer[buffer_size - 1] = '\0';
-
-			this->write(asychronized, &buffer[0]);
 		}
-
 
 
 		void tcp_client::disconnect()
@@ -116,7 +224,6 @@ namespace dooqu_server
 		}
 
 
-
 		void tcp_client::on_data_received(const boost::system::error_code& error, size_t bytes_received)
 		{
 			if (tcp_client::LOG_IO_DATA)
@@ -126,16 +233,9 @@ namespace dooqu_server
 		}
 
 
-
-		void tcp_client::send_handle(const boost::system::error_code& error)
-		{
-		}
-
-
-
 		tcp_client::~tcp_client()
 		{
-			
+
 		}
 	}
 }
