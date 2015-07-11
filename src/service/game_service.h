@@ -62,6 +62,7 @@ namespace dooqu_server
 			//Ó¦ÓÃ²ã×¢²á
 			void client_login_handle(game_client* client, command* command);
 			void robot_login_handle(game_client* client, command* command);
+			void check_client_on_service_handle(game_client* host, command* command);
 
 		public:
 
