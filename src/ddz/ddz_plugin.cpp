@@ -228,14 +228,16 @@ namespace dooqu_server
 				sprintf(client_curr_money, "%d", curr_game_info->money());
 
 				//向进入桌子的玩家通知当前桌子的玩家列表
-				client->write(true, "LSD", desk->pos_client(i)->id(), desk->pos_client(i)->name(), ddz_plugin::POS_STRINGS[i], (curr_game_info->is_ready()) ? "1" : "0", client_curr_money, NULL);
+				client->write("LSD %s %s %s %c %d\0", desk->pos_client(i)->id(), desk->pos_client(i)->name(), ddz_plugin::POS_STRINGS[i], (curr_game_info->is_ready()) ? '1' : '0', client_curr_money);
 
 				//向已有的玩家通知进来玩家的信息
 				if (desk->pos_client(i) != client)
 				{
-					desk->pos_client(i)->write(true, "JDK", client->id(), client->name(), ddz_plugin::POS_STRINGS[pos_index], "0", client_in_money, NULL);
+					desk->pos_client(i)->write("JDK %s %s %c %c %d\0", client->id(), client->name(), ddz_plugin::POS_STRINGS[pos_index], "0", client_in_money);
 				}
 			}
+
+			client->disconnect(service_error::GAME_IS_FULL);
 		}
 
 
@@ -263,7 +265,7 @@ namespace dooqu_server
 			//如果玩家还在线，通知他已经成功离开
 			if (client->available())
 			{
-				client->write(true, "ODK", desk->id(), ddz_desk::POS_STRINGS[pos_index], NULL);
+				client->write("ODK %s %c\0", desk->id(), ddz_desk::POS_STRINGS[pos_index]);
 			}
 
 			//通知每个人LDK的消息
@@ -273,7 +275,7 @@ namespace dooqu_server
 
 				if (curr_client != NULL)
 				{
-					curr_client->write(true, "LDK", client->id(), ddz_desk::POS_STRINGS[pos_index], NULL);
+					curr_client->write("LDK %s %c\0", client->id(), ddz_desk::POS_STRINGS[pos_index]);
 				}
 			}
 
@@ -333,7 +335,7 @@ namespace dooqu_server
 
 				pos_poker_list::iterator poker_list = desk->pos_pokers(i)->begin();
 
-				desk->pos_client(i)->write(true, "STT",
+				desk->pos_client(i)->write("STT %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\0",
 					(*++poker_list),
 					(*++poker_list),
 					(*++poker_list),
@@ -950,7 +952,7 @@ namespace dooqu_server
 					{
 						is_all_ready = false;
 					}
-					curr_client->write(true, "RDY", client->id(), ddz_desk::POS_STRINGS[pos_index], NULL);
+					curr_client->write("RDY %s, %c\0", client->id(), ddz_desk::POS_STRINGS[pos_index]);
 				}
 			}
 
