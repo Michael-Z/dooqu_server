@@ -359,7 +359,7 @@ namespace dooqu_server
 
 			for (curr_client = this->clients_.begin(); curr_client != this->clients_.end(); curr_client++)
 			{
-				(*curr_client).second->write(asynchronized, message);
+				(*curr_client).second->write(message);
 			}
 		}
 
