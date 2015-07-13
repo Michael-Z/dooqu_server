@@ -8,10 +8,12 @@ namespace dooqu_server
 		command::command()
 		{
 			this->name_ = NULL;
-			this->command_data_ = NULL;
+			//this->command_data_ = NULL;
 			this->is_correct_ = false;
 
 			this->null();
+
+			this->command_data_ = NULL;
 		}
 
 		void command::null()
@@ -20,11 +22,11 @@ namespace dooqu_server
 			this->name_ = NULL;
 			this->params_.clear();
 
-			if (this->command_data_ != NULL)
-			{
-				delete[] this->command_data_;
-				this->command_data_ = NULL;
-			}
+			//if (this->command_data_ != NULL)
+			//{
+			//	delete[] this->command_data_;
+			//	this->command_data_ = NULL;
+			//}
 		}
 
 		char* command::name()

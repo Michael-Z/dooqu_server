@@ -35,6 +35,9 @@ namespace dooqu_server
 
 			if (client->buffer_pos > tcp_client::MAX_BUFFER_SIZE)
 			{
+				printf("buffer size=%d\n", tcp_client::MAX_BUFFER_SIZE);
+				printf("client->bufferPos=%d\n", client->buffer_pos);
+
 				client->disconnect(service_error::DATA_OUT_OF_BUFFER);
 
 				//此后一句on_error必须添加，因为该段最后已经return， 没有继续recv，也就无法触发0接收
@@ -48,7 +51,7 @@ namespace dooqu_server
 				if (client->buffer[i] == 0)
 				{
 					this->on_client_data(client, &client->buffer[cmd_start_pos]);
-
+					
 					//如果on_data 中如需要对用户进行离线处理，那么只需调用disconnect
 					//在disconnect中，设置available = false，并关闭接收，关闭socket。
 					//那么在之后的检查中，判断需要对用户的离开进行处理，调用on_error进行清理，并离开大逻辑循环。
