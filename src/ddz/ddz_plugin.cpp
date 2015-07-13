@@ -166,11 +166,7 @@ namespace dooqu_server
 
 			game_plugin::on_client_join(client);
 
-			char data_buffer[BUFFER_SIZE_MIDDLE];
-			int n = sprintf(data_buffer, "LOG %s %s %d", this->game_id(), client->id(), this->max_waiting_duration_);
-			data_buffer[std::min(n - 1, BUFFER_SIZE_MIDDLE - 1)] = 0;
-
-			client->write(data_buffer);
+			client->write("LOG %s %s %d%c", this->game_id(), client->id(), this->max_waiting_duration_, 0);
 		}
 
 		//client 离开，会发送BYE命令；
@@ -203,7 +199,7 @@ namespace dooqu_server
 			game_info->desk_ = desk;
 
 			//先通知用户进入桌子
-			client->write("IDK %s %d\0", desk->id(), pos_index);
+			client->write("IDK %s %d%c", desk->id(), pos_index, 0);
 
 			//后进来用户的游戏币信息
 			//char client_in_money[BUFFER_SIZE_SMALL] = { 0 };
@@ -211,7 +207,7 @@ namespace dooqu_server
 
 
 			//房间里每个玩家的游戏币信息
-			char client_curr_money[BUFFER_SIZE_SMALL];
+			//char client_curr_money[BUFFER_SIZE_SMALL];
 
 			for (int i = 0; i < ddz_desk::DESK_CAPACITY; ++i)
 			{
@@ -225,12 +221,12 @@ namespace dooqu_server
 				//sprintf(client_curr_money, "%d", curr_game_info->money());
 
 				//向进入桌子的玩家通知当前桌子的玩家列表
-				client->write("LSD %s %s %s %c %d\0", desk->pos_client(i)->id(), desk->pos_client(i)->name(), ddz_plugin::POS_STRINGS[i], (curr_game_info->is_ready()) ? '1' : '0', curr_game_info->money());
+				client->write("LSD %s %s %s %c %d%c", desk->pos_client(i)->id(), desk->pos_client(i)->name(), ddz_plugin::POS_STRINGS[i], (curr_game_info->is_ready()) ? '1' : '0', curr_game_info->money(), 0);
 
 				//向已有的玩家通知进来玩家的信息
 				if (desk->pos_client(i) != client)
 				{
-					desk->pos_client(i)->write("JDK %s %s %s %c %d\0", client->id(), client->name(), ddz_plugin::POS_STRINGS[pos_index], '0', game_info->money());
+					desk->pos_client(i)->write("JDK %s %s %s %c %d%c", client->id(), client->name(), ddz_plugin::POS_STRINGS[pos_index], '0', game_info->money(), 0);
 				}
 			}
 		}
@@ -260,7 +256,7 @@ namespace dooqu_server
 			//如果玩家还在线，通知他已经成功离开
 			if (client->available())
 			{
-				client->write("ODK %s %s\0", desk->id(), ddz_desk::POS_STRINGS[pos_index]);
+				client->write("ODK %s %s%c", desk->id(), ddz_desk::POS_STRINGS[pos_index], NULL);
 			}
 
 			//通知每个人LDK的消息
@@ -270,7 +266,7 @@ namespace dooqu_server
 
 				if (curr_client != NULL)
 				{
-					curr_client->write("LDK %s %s\0", client->id(), ddz_desk::POS_STRINGS[pos_index]);
+					curr_client->write("LDK %s %s%c", client->id(), ddz_desk::POS_STRINGS[pos_index], NULL);
 				}
 			}
 
@@ -330,7 +326,7 @@ namespace dooqu_server
 
 				pos_poker_list::iterator poker_list = desk->pos_pokers(i)->begin();
 
-				desk->pos_client(i)->write("STT %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\0",
+				desk->pos_client(i)->write("STT %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s%c",
 					(*++poker_list),
 					(*++poker_list),
 					(*++poker_list),
@@ -890,7 +886,7 @@ namespace dooqu_server
 				}
 			}
 
-			client->write("IDK -1\0");
+			client->write("IDK -1%c", NULL);
 		}
 
 
@@ -947,7 +943,7 @@ namespace dooqu_server
 					{
 						is_all_ready = false;
 					}
-					curr_client->write("RDY %s %s\0", client->id(), ddz_desk::POS_STRINGS[pos_index]);
+					curr_client->write("RDY %s %s%c", client->id(), ddz_desk::POS_STRINGS[pos_index], NULL);
 				}
 			}
 

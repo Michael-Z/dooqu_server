@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <queue>
 #include <list>
+#include <vector>
 #include <cstdarg>
 #include <string>
 #include <boost/asio.hpp>
@@ -49,6 +50,7 @@ inline void enable_mem_leak_check()
 
 int main(int argc, char* argv[])
 {
+
 
 	enable_mem_leak_check();
 

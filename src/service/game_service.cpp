@@ -335,11 +335,17 @@ namespace dooqu_server
 					printf("http authentication server error.\n");
 					ret = service_error::LOGIN_SERVICE_ERROR;
 				}
+				client->write("ERR %d%c", ret, NULL);
+				client->disconnect_when_io_end();
+				client->disconnect();
+
+				return;
 
 				if (ret != service_error::OK)
 				{
 					printf("disconnect client because auth error.\n");
-					client->disconnect(ret);
+					client->write("ERR %d%c", ret, NULL);
+					client->disconnect_when_io_end();
 				}
 
 				break;

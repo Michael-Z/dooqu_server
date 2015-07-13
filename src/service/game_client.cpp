@@ -152,7 +152,7 @@ namespace dooqu_server
 				//Éè¶¨´íÎóºÅ
 				this->error_code_ = code;
 
-				this->write("ERR %d\0", this->error_code_);
+				this->write("ERR %d%c", this->error_code_, NULL);
 				this->disconnect_when_io_end();
 				//¹Ø±Õsocket
 				//tcp_client::disconnect();

@@ -152,6 +152,9 @@ namespace dooqu_server
 
 			command_dispatcher::on_client_command(client, command);
 
+
+			printf("CMD:%s->%s", command->name(), client->id());
+
 			{
 				using namespace dooqu_server::net;
 

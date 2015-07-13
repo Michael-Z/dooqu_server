@@ -35,8 +35,6 @@ namespace dooqu_server
 
 			if (client->buffer_pos > tcp_client::MAX_BUFFER_SIZE)
 			{
-				printf("buffer size=%d\n", tcp_client::MAX_BUFFER_SIZE);
-				printf("client->bufferPos=%d\n", client->buffer_pos);
 
 				client->disconnect(service_error::DATA_OUT_OF_BUFFER);
 

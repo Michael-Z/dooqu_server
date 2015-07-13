@@ -59,6 +59,64 @@ namespace dooqu_server
 		using namespace boost::asio;
 		using namespace boost::asio::ip;
 
+		class buffer_stream
+		{
+		protected:
+			std::vector<char> buffer_;
+			int size_;
+		public:
+			char* read()
+			{
+				return &*this->buffer_.begin();
+			}
+
+			buffer_stream(size_t size) : buffer_(size, 0)
+			{
+				this->size_ = size;
+				printf("create buffer_stream.\n");
+			}
+
+			int size()
+			{
+				return this->size_;
+			}
+
+			int write(const char* format, va_list arg_ptr)
+			{
+				int buff_size = this->buffer_.size();
+
+				int n = vsnprintf(&*this->buffer_.begin(), this->size_, format, arg_ptr);
+
+				if (n != -1)
+					this->size_ = n;
+
+				return n;
+			}
+
+			int capacity()
+			{
+				return this->buffer_.capacity();
+			}
+
+			void double_size()
+			{
+				this->buffer_.resize(this->buffer_.size() * 2, 0);
+				this->size_ = this->buffer_.size();
+			}
+
+			char* at(int pos)
+			{
+				return &this->buffer_.at(pos);
+			}
+
+			void zero()
+			{
+				this->buffer_.clear();
+				this->buffer_.resize(0);
+				this->size_ = 0;
+			}
+		};
+
 		class tcp_server;
 
 		class tcp_client : boost::noncopyable
@@ -71,7 +129,7 @@ namespace dooqu_server
 			boost::recursive_mutex status_lock_;
 
 			//发送数据缓冲区		
-			std::vector< std::vector<char> > send_buffer_sequence_;		
+			std::vector<buffer_stream> send_buffer_sequence_;		
 
 			//数据锁
 			boost::mutex send_buffer_lock_;
@@ -126,7 +184,7 @@ namespace dooqu_server
 			//当客户端出现规则错误时进行调用， 该方法为虚方法，由子类进行具体的逻辑的实现。
 			virtual void on_error(const int error) = 0;
 
-			inline bool alloc_available_buffer(std::vector<char>** buffer_alloc);
+			inline bool alloc_available_buffer(buffer_stream** buffer_alloc);
 
 		public:
 			tcp_client(io_service& ios);
