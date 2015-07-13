@@ -1,33 +1,45 @@
 ﻿#ifndef __TCP_CLIENT_H__
 #define __TCP_CLIENT_H__
 
+ 
 /*
-对于用户离开的处理：
+status_lock_
+command_lock_
+data_sequence_lock_
 
-1、当用户网络错误、直接关闭客户的情况：
-a.receive_handle会直接进入error的分支
-b.在error分支中将tcp_client.availible_置成 false,标识socket不可用
-c.在error分支处理on_error.
-d.在game_client.on_error中进行simulate_receive.BYE，将离开通知逻辑处理
-e.on_error处理完后，delete this.
+receive_from_client
+{
+}
 
-2、当用户输入非法内容、例如发送超长:
-a.在receive_handle中有两处进行了超长的检查，会先调用game_client.on_error，并传入error号
-b.在game_client.on_error中进行simulate_receive.BYE，将用户的离开通知逻辑处理
-c.在game_service.on_client_leave中将错误的原因通知用户，但在这里并不关闭socket
-d.逻辑返回到receive_handle的delete this. 销毁实例
+on_receive_data
+{
+lock(status_lock_);
+lock(command_lock);
+}
 
-3、在用户输入BYE，申请离开
-a.在receive_handle中的on_data中进行处理
-b.on_data将BYE送给逻辑处理，并最后调用game_service.on_client_leave， 由改方法调用client.disconnect将availiable置false，并关闭socket
-c.返回到receive_handle继续语句处理，后续语句发现经过on_data后，availible已经置false,说明用户已经不可用，delete this.
+send_data
+{
+lock(status_lock_);
+lock(data_sequence_lock_);
+}
 
-4、异步的检查，发现用户超时等
-a.如不回显，可直接调用game_client.disconnect，将availible置false，并关闭socket.
-b.关闭socket后， receive_handle会理解返回，并进入error分支.
-c.error分支分支处理on_error
-d.在game_client.on_error中进行simulate_receive.BYE，将离开通知逻辑处理
-e.on_error处理完后，delete this.
+send_handle
+{
+lock(status_lock_);
+lock(data_sequence_lock_);
+}
+
+disconnect()
+{
+lock(status_lock_);
+}
+
+
+disconnect_when_io_end()
+{
+lock(status_lock_);
+lock(data_sequence_lock_);
+}
 
 */
 
@@ -54,13 +66,14 @@ namespace dooqu_server
 		public:
 			enum{ MAX_BUFFER_SIZE = 65 };
 		protected:
+			//状态锁
 
 			boost::recursive_mutex status_lock_;
 
+			//发送数据缓冲区		
+			std::vector< std::vector<char> > send_buffer_sequence_;		
 
-			//发送数据缓冲区
-		
-			std::vector< std::vector<char> > send_buffer_sequence_;			
+			//数据锁
 			boost::mutex send_buffer_lock_;
 
 			//正在处理的位置，这个位置是发送函数正在读取的位置
