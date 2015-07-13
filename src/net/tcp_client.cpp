@@ -13,16 +13,18 @@ namespace dooqu_server
 			: ios(ios),
 			t_socket(ios),
 			send_buffer_sequence_(1, std::vector<char>(MAX_BUFFER_SIZE + 1, 0)),
-			read_pos_(-1), write_pos_(0),
+			read_pos_(-1), write_pos_(0), available_(false),
 			buffer_pos(0)
 		{
 			this->p_buffer = &this->buffer[0];
-			memset(this->buffer, 0, sizeof(this->buffer));
+			memset(this->buffer, 0, sizeof(MAX_BUFFER_SIZE));
 		}
 
 
 		void tcp_client::read_from_client()
 		{
+			//boost::recursive_mutex::scoped_lock lock(this->status_lock_);
+
 			if (this->available() == false)
 				return;
 
@@ -70,9 +72,6 @@ namespace dooqu_server
 
 		void tcp_client::write(char* data)
 		{
-			if (this->available() == false)
-				return;
-
 			//默认调用的是异步的写
 			this->write("%s", data);
 		}
@@ -80,10 +79,12 @@ namespace dooqu_server
 
 		void tcp_client::write(const char* format, ...)
 		{
+			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+
 			if (this->available() == false)
 				return;
 
-			boost::mutex::scoped_lock lock(this->send_buffer_lock_);
+			boost::mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
 
 			std::vector<char>* curr_buffer = NULL;
 
@@ -92,8 +93,6 @@ namespace dooqu_server
 
 			if (ret == false)
 			{
-				//this->available_ = false;
-
 				this->disconnect();
 				return;
 			}
@@ -119,7 +118,6 @@ namespace dooqu_server
 			} while (c_size == curr_buffer->size() && curr_buffer->at(curr_buffer->size() - 1) != 0 && try_count-- > 0);
 
 
-
 			//如果正在发送的索引为-1，说明空闲
 			if (read_pos_ == -1)
 			{
@@ -134,10 +132,12 @@ namespace dooqu_server
 
 		void tcp_client::disconnect_when_io_end()
 		{
+			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+
 			if (this->available() == false)
 				return;
 
-			boost::mutex::scoped_lock lock(this->send_buffer_lock_);
+			boost::mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
 
 
 			if (this->read_pos_ != -1)
@@ -154,7 +154,7 @@ namespace dooqu_server
 				}
 			}
 
-			this->disconnect();			
+			this->disconnect();
 		}
 
 
@@ -166,12 +166,16 @@ namespace dooqu_server
 				return;
 			}
 
+
+			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+
+			//这里考虑下极限情况，如果this已经被销毁？
 			if (this->available() == false)
 			{
 				return;
 			}
 
-			boost::mutex::scoped_lock lock(this->send_buffer_lock_);
+			boost::mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
 
 			std::vector<char>* curr_buffer = NULL; &this->send_buffer_sequence_.at(this->read_pos_);
 
@@ -210,7 +214,7 @@ namespace dooqu_server
 
 		void tcp_client::disconnect()
 		{
-			boost::recursive_mutex::scoped_lock lock(this->status_lock_);
+			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
 
 			if (this->available_)
 			{
