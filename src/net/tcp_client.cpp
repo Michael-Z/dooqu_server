@@ -23,7 +23,7 @@ namespace dooqu_server
 
 		void tcp_client::read_from_client()
 		{
-			//boost::recursive_mutex::scoped_lock lock(this->status_lock_);
+			boost::recursive_mutex::scoped_lock lock(this->status_lock_);
 
 			if (this->available() == false)
 				return;
