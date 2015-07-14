@@ -59,8 +59,7 @@ namespace dooqu_server
 			void set_game_info(game_info* info){this->game_info_ = info;}
 			inline bool can_message(){ return this->message_monitor_.can_active(); }
 			inline bool can_active(){ return this->active_monitor_.can_active(); }
-			virtual void disconnect();
-			virtual void disconnect(int code);
+			void disconnect(int code);
 		};
 	}
 }

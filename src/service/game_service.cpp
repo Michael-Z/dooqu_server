@@ -208,7 +208,7 @@ namespace dooqu_server
 
 			{
 				//上锁，放置和tcp_client::receive_handle进行冲突
-				boost::recursive_mutex::scoped_lock lock(client->status_lock_);
+				//boost::recursive_mutex::scoped_lock lock(client->status_lock_);
 				client->~game_client();
 				boost::singleton_pool<game_client, sizeof(game_client)>::free(client);
 			}
@@ -218,7 +218,7 @@ namespace dooqu_server
 		//使用了定时器
 		void game_service::on_check_timeout_clients(const boost::system::error_code &error)
 		{
-			//printf("game_service::on_run's thread id:%d\n", boost::this_thread::get_id());
+			printf("game_service::on_run's thread id:%d\n", boost::this_thread::get_id());
 
 			//thread_mutex_map::iterator curr_mutex = this->thread_mutexs()->find(boost::this_thread::get_id());
 			//boost::recursive_mutex::scoped_lock lock(*curr_mutex->second);
@@ -335,11 +335,6 @@ namespace dooqu_server
 					printf("http authentication server error.\n");
 					ret = service_error::LOGIN_SERVICE_ERROR;
 				}
-				client->write("ERR %d%c", ret, NULL);
-				client->disconnect_when_io_end();
-				client->disconnect();
-
-				return;
 
 				if (ret != service_error::OK)
 				{
@@ -395,7 +390,7 @@ namespace dooqu_server
 				return;
 
 			//更新激活时间，防止被另外一个线程的更新销毁掉。
-			client->active();
+			//client->active();
 
 			int result_code = service_error::OK;
 

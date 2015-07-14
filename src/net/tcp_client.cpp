@@ -12,9 +12,10 @@ namespace dooqu_server
 		tcp_client::tcp_client(io_service& ios)
 			: ios(ios),
 			t_socket(ios),
-			send_buffer_sequence_(1, buffer_stream(MAX_BUFFER_SIZE)),
-			read_pos_(-1), write_pos_(0), available_(false),
-			buffer_pos(0)
+			send_buffer_sequence_(3, buffer_stream(MAX_BUFFER_SIZE)),
+			read_pos_(-1), write_pos_(0), 
+			buffer_pos(0),
+			available_(false)
 		{
 			this->p_buffer = &this->buffer[0];
 			memset(this->buffer, 0, sizeof(MAX_BUFFER_SIZE));
@@ -48,7 +49,7 @@ namespace dooqu_server
 			{
 				//如果指向的位置不存在，需要新申请对象；
 				//如果已经存在了超过16个对象，说明网络异常那么断开用户；不再新申请数据;
-				if (this->send_buffer_sequence_.size() > 16)
+				if (this->send_buffer_sequence_.size() > MAX_BUFFER_SEQUENCE_SIZE)
 				{
 					*buffer_alloc = NULL;
 					return false;
@@ -84,7 +85,7 @@ namespace dooqu_server
 			if (this->available() == false)
 				return;
 
-			boost::mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
+			boost::recursive_mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
 
 			buffer_stream* curr_buffer = NULL;
 
@@ -99,11 +100,11 @@ namespace dooqu_server
 
 			//代码到这里 send_buffer已经获取到，下面准备向内填写数据;
 			int buff_size = 0;
-			int try_count = 5;
+			int try_count = MAX_BUFFER_SIZE_DOUBLE_TIMES;
 
 			do
 			{
-				if (try_count < 5)
+				if (try_count < MAX_BUFFER_SIZE_DOUBLE_TIMES)
 				{
 					curr_buffer->double_size();
 				}
@@ -115,12 +116,17 @@ namespace dooqu_server
 
 				va_end(arg_ptr);
 
+				if (buff_size == -1)
+				{
+					printf(format);
+				}
+
 			} while ((buff_size == -1 || (curr_buffer->size() == curr_buffer->capacity() && *curr_buffer->at(curr_buffer->size() - 1) != 0)) && try_count-- > 0);
 
 
 			if (buff_size == -1)
 			{
-				printf("server message error.\n");
+				printf("ERROR: server message queue limited,the message can not be send.\n");
 				this->write_pos_--;
 				return;
 			}
@@ -138,31 +144,6 @@ namespace dooqu_server
 		}
 
 
-		void tcp_client::disconnect_when_io_end()
-		{
-			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
-
-			if (this->available() == false)
-				return;
-
-			boost::mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
-
-
-			if (this->read_pos_ != -1)
-			{
-				buffer_stream* curr_buffer = NULL;
-
-				bool alloc_ret = this->alloc_available_buffer(&curr_buffer);
-
-				if (alloc_ret)
-				{
-					curr_buffer->zero();
-					return;
-				}
-			}
-
-			this->disconnect();
-		}
 
 
 		void tcp_client::send_handle(const boost::system::error_code& error)
@@ -182,7 +163,7 @@ namespace dooqu_server
 				return;
 			}
 
-			boost::mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
+			boost::recursive_mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
 
 			buffer_stream* curr_buffer = &this->send_buffer_sequence_.at(this->read_pos_);
 
@@ -203,7 +184,7 @@ namespace dooqu_server
 
 				buffer_stream* curr_buffer = &this->send_buffer_sequence_.at(this->read_pos_);
 
-				if (curr_buffer->size() == 0)
+				if (curr_buffer->is_bye_signal())
 				{
 					this->disconnect();
 					return;
@@ -214,6 +195,34 @@ namespace dooqu_server
 
 			}
 		}
+
+
+		void tcp_client::disconnect_when_io_end()
+		{
+			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+
+			if (this->available() == false)
+				return;
+
+			boost::recursive_mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
+
+
+			if (this->read_pos_ != -1)
+			{
+				buffer_stream* curr_buffer = NULL;
+
+				bool alloc_ret = this->alloc_available_buffer(&curr_buffer);
+
+				if (alloc_ret)
+				{
+					curr_buffer->set_bye_signal();
+					return;
+				}
+			}
+
+			this->disconnect();
+		}
+
 
 
 		void tcp_client::disconnect()
@@ -243,7 +252,6 @@ namespace dooqu_server
 
 		tcp_client::~tcp_client()
 		{
-
 		}
 	}
 }

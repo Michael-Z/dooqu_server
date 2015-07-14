@@ -65,6 +65,8 @@ namespace dooqu_server
 			std::vector<char> buffer_;
 			int size_;
 		public:
+
+			//从buffer_stream中向外读取
 			char* read()
 			{
 				return &*this->buffer_.begin();
@@ -73,7 +75,7 @@ namespace dooqu_server
 			buffer_stream(size_t size) : buffer_(size, 0)
 			{
 				this->size_ = size;
-				printf("create buffer_stream.\n");
+				printf("->create buffer_stream.\n");
 			}
 
 			int size()
@@ -81,14 +83,17 @@ namespace dooqu_server
 				return this->size_;
 			}
 
+			//向buffer_stream中写入数据
 			int write(const char* format, va_list arg_ptr)
 			{
 				int buff_size = this->buffer_.size();
 
-				int n = vsnprintf(&*this->buffer_.begin(), this->size_, format, arg_ptr);
+				int n = vsnprintf(read(), this->buffer_.capacity(), format, arg_ptr);
 
 				if (n != -1)
+				{
 					this->size_ = n;
+				}
 
 				return n;
 			}
@@ -109,11 +114,16 @@ namespace dooqu_server
 				return &this->buffer_.at(pos);
 			}
 
-			void zero()
+			void set_bye_signal()
 			{
 				this->buffer_.clear();
 				this->buffer_.resize(0);
-				this->size_ = 0;
+				this->size_ = -1;
+			}
+
+			bool is_bye_signal()
+			{
+				return this->size_ == -1;
 			}
 		};
 
@@ -122,7 +132,7 @@ namespace dooqu_server
 		class tcp_client : boost::noncopyable
 		{
 		public:
-			enum{ MAX_BUFFER_SIZE = 65 };
+			enum{ MAX_BUFFER_SIZE = 65 , MAX_BUFFER_SEQUENCE_SIZE = 16, MAX_BUFFER_SIZE_DOUBLE_TIMES = 4};
 		protected:
 			//状态锁
 
@@ -132,7 +142,7 @@ namespace dooqu_server
 			std::vector<buffer_stream> send_buffer_sequence_;		
 
 			//数据锁
-			boost::mutex send_buffer_lock_;
+			boost::recursive_mutex send_buffer_lock_;
 
 			//正在处理的位置，这个位置是发送函数正在读取的位置
 			int read_pos_;
@@ -184,16 +194,18 @@ namespace dooqu_server
 			//当客户端出现规则错误时进行调用， 该方法为虚方法，由子类进行具体的逻辑的实现。
 			virtual void on_error(const int error) = 0;
 
+
 			inline bool alloc_available_buffer(buffer_stream** buffer_alloc);
 
 		public:
 			tcp_client(io_service& ios);
 
+			virtual ~tcp_client();
 
 			tcp::socket& socket(){ return this->t_socket; }
 
 
-			inline virtual bool available(){ return this->available_ && this->t_socket.is_open(); }
+			inline bool available(){ return this->available_ && this->t_socket.is_open(); }
 
 
 			void write(char* data);
@@ -205,13 +217,7 @@ namespace dooqu_server
 			void disconnect_when_io_end();
 
 
-			void disconnect();
-
-
-			virtual void disconnect(int error_code) = 0;
-
-
-			virtual ~tcp_client();
+			void disconnect();			
 
 
 			static long CURR_RECE_TOTAL;

@@ -1,7 +1,4 @@
 #include "command_dispatcher.h"
-#include <iostream>
-#include <cstring>
-
 #include "game_client.h"
 
 namespace dooqu_server
@@ -29,18 +26,22 @@ namespace dooqu_server
 			this->on_client_data_received(client, bytes_received);
 		}
 
+
 		void command_dispatcher::on_client_data_received(game_client* client, size_t bytes_received)
 		{
 			client->buffer_pos += bytes_received;
 
 			if (client->buffer_pos > tcp_client::MAX_BUFFER_SIZE)
 			{
+				//不建议使用client->disconnect/disconnect_when_io_end
+				//在on_error之后，会自动调用socket的close.
+				client->write("ERR %d%c", service_error::DATA_OUT_OF_BUFFER, NULL);
 
-				client->disconnect(service_error::DATA_OUT_OF_BUFFER);
+				client->available_ = false;
 
 				//此后一句on_error必须添加，因为该段最后已经return， 没有继续recv，也就无法触发0接收
 				client->on_error(service_error::DATA_OUT_OF_BUFFER);
-				//delete this;
+
 				return;
 			}
 
@@ -49,13 +50,12 @@ namespace dooqu_server
 				if (client->buffer[i] == 0)
 				{
 					this->on_client_data(client, &client->buffer[cmd_start_pos]);
-					
+
 					//如果on_data 中如需要对用户进行离线处理，那么只需调用disconnect
 					//在disconnect中，设置available = false，并关闭接收，关闭socket。
 					//那么在之后的检查中，判断需要对用户的离开进行处理，调用on_error进行清理，并离开大逻辑循环。
 					if (client->available() == false)
 					{
-						//delete this;
 						client->on_error(NULL);
 						return;
 					}
@@ -72,11 +72,13 @@ namespace dooqu_server
 					{
 						if ((client->buffer_pos - cmd_start_pos) >= tcp_client::MAX_BUFFER_SIZE)
 						{
-							client->disconnect(service_error::DATA_OUT_OF_BUFFER);
+							client->write("ERR %d%c", service_error::DATA_OUT_OF_BUFFER, NULL);
+
+							client->available_ = false;
 
 							//此后一句on_error必须添加，因为该段最后已经return， 没有继续recv，也就无法触发0接收
 							client->on_error(service_error::DATA_OUT_OF_BUFFER);
-							//delete this;
+
 							return;
 						}
 
@@ -106,9 +108,12 @@ namespace dooqu_server
 			client->read_from_client();
 		}
 
+
 		void command_dispatcher::on_client_data(game_client* client, char* data)
 		{
 			boost::recursive_mutex::scoped_lock lock(client->commander_mutex_);
+
+			client->active();
 
 			client->commander_.reset(data);
 
@@ -123,6 +128,7 @@ namespace dooqu_server
 		{
 			this->on_client_data(client, data);
 		}
+
 
 		void command_dispatcher::on_client_command(game_client* client, command* command)
 		{
@@ -140,6 +146,7 @@ namespace dooqu_server
 		{
 			this->handles.erase(cmd_name);
 		}
+
 
 		void command_dispatcher::remove_all_handles()
 		{
