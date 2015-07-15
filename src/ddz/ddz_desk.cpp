@@ -1,5 +1,4 @@
 #include "ddz_desk.h"
-#include "../service/game_client.h"
 #include <cstdlib>
 
 namespace dooqu_server

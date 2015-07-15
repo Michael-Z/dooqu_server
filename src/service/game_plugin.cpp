@@ -4,6 +4,7 @@
 #include <cstring>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include "..\net\threads_lock_status.h"
 
 namespace dooqu_server
 {
@@ -170,6 +171,7 @@ namespace dooqu_server
 
 		void game_plugin::on_update_timeout_clients()
 		{
+			return;
 			boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
 			for (game_client_map::iterator e = this->clients_.begin();
 				e != this->clients_.end();
@@ -178,7 +180,7 @@ namespace dooqu_server
 				game_client* client = (*e).second;
 				if (client->actived_time.elapsed() > 60 * 1000)
 				{
-					client->disconnect(service_error::TIME_OUT);
+					this->game_service_->get_io_service().post(boost::bind(&game_client::disconnect, client, service_error::TIME_OUT));// client->disconnect(service_error::TIME_OUT);
 				}
 			}
 		}
@@ -212,6 +214,7 @@ namespace dooqu_server
 
 				this->on_unload();
 
+				
 				boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
 
 				for (game_client_map::iterator curr_client_pair = this->clients_.begin();
@@ -227,8 +230,12 @@ namespace dooqu_server
 
 		int game_plugin::join_client(game_client* client)
 		{
+			thread_status::log("start->game_plugin::join_client.clients_lock");
 			//对成员组进行上锁
 			boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
+
+			thread_status::log("end->game_plugin::join_client.clients_lock");
+
 
 			//测试当前加入的玩家是否有资格进入成员组
 			int ret = this->on_befor_client_join(client);
@@ -254,7 +261,9 @@ namespace dooqu_server
 		void game_plugin::remove_client_from_plugin(game_client* client)
 		{
 			{
+				thread_status::log("start->game_plugin::remove_client_from_plugin.clients_lock");
 				boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
+				thread_status::log("end->game_plugin::remove_client_from_plugin.clients_lock");
 
 				this->clients_.erase(client->id());
 				this->on_client_leave(client, client->error_code_);
@@ -356,7 +365,9 @@ namespace dooqu_server
 
 		void game_plugin::broadcast(char* message, bool asynchronized)
 		{
+			thread_status::log("start->game_plugin::broadcast.clients_lock");
 			boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
+			thread_status::log("end->game_plugin::broadcast.clients_lock");
 
 			game_client_map::iterator curr_client;
 

@@ -123,6 +123,9 @@
     <ClInclude Include="src\service\ip_monitor.h">
       <Filter>头文件\service</Filter>
     </ClInclude>
+    <ClInclude Include="src\net\threads_lock_status.h">
+      <Filter>头文件\net</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

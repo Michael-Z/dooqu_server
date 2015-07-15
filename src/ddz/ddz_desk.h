@@ -1,7 +1,7 @@
 #ifndef __DDZ_DESK_H__
 #define __DDZ_DESK_H__
 
-//#include <boost\thread\mutex.hpp>
+
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/noncopyable.hpp>
 #include <set>

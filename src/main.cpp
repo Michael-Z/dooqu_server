@@ -20,6 +20,7 @@
 #include <boost/pool/pool.hpp>
 #include "service\post_monitor.h"
 #include "plane\plane_plugin.h"
+//#include "net\threads_lock_status.h"
 
 using namespace boost::asio;
 
@@ -145,6 +146,25 @@ int main(int argc, char* argv[])
 			else if (std::strcmp(read_line.c_str(), "unload") == 0)
 			{
 				service.stop();
+			}
+			else if (std::strcmp(read_line.c_str(), "update") == 0)
+			{
+				service.tick_count_threads();
+				boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+
+				for (dooqu_server::net::thread_status_map::iterator curr_thread_pair = service.threads_status()->begin();
+					curr_thread_pair != service.threads_status()->end();
+					++curr_thread_pair)
+				{
+					printf("thread:%d, %ld\n", (*curr_thread_pair).first, (*curr_thread_pair).second->elapsed());
+				}
+
+				for (std::map<boost::thread::id, char*>::iterator e = thread_status::messages.begin();
+					e != thread_status::messages.end();
+					++e)
+				{
+					printf("thread id %d, %s\n", (*e).first, (*e).second);
+				}
 			}
 			cin.clear();
 			printf("please input the service command:\n");

@@ -32,7 +32,11 @@ namespace dooqu_server
 				//在其他工作者线程上，同一时间不肯定不会有receive_handle的调用，因为receive本质是一个串行的动作；
 				//但是! 可能因为逻辑需要、在其他工作者线程上调用disconnect函数，所以必须要同步status；
 				//防止在这个代码片段的中间被其他线程disconnect掉
-				//boost::recursive_mutex::scoped_lock lock(this->status_lock_);
+
+				thread_status::log("start->game_client::on_date_received.status_lock_");
+				boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+				thread_status::log("end->game_client::on_date_received.status_lock_");
+
 
 				if (!error)
 				{

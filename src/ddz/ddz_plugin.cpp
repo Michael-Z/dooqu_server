@@ -87,7 +87,11 @@ namespace dooqu_server
 			for (int i = 0; i < this->desks_.size(); ++i)
 			{
 				ddz_desk* desk = this->desks_.at(i);
+
+				thread_status::log("start->ddz_plugin::on_update.desk_status");
 				boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+				thread_status::log("end->ddz_plugin::on_update.desk_status");
+
 
 				if (desk->is_running() == true)
 				{
@@ -181,7 +185,9 @@ namespace dooqu_server
 				ddz_desk* desk = game_info->get_desk();
 				if (desk != NULL)
 				{
+					thread_status::log("start->ddz_plugin::on_client_leave.desk_status");
 					boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+					thread_status::log("end->ddz_plugin::on_client_leave.desk_status");
 					this->on_client_leave_desk(client, desk, client->error_code());
 				}
 
@@ -365,8 +371,9 @@ namespace dooqu_server
 
 			if (desk == NULL)
 				return;
-
+			thread_status::log("start->ddz_plugin::on_client_declare_handle.desk_status");
 			boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+			thread_status::log("end->ddz_plugin::on_client_declare_handle.desk_status");
 
 			if (desk->is_running() == false)
 				return;
@@ -432,8 +439,9 @@ namespace dooqu_server
 
 			if (desk->verifi_code != verifi_code)
 				return;
-
+			thread_status::log("start->ddz_plugin::on_game_bid.desk_status");
 			boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+			thread_status::log("end->ddz_plugin::on_game_bid.desk_status");
 
 			if (desk->is_running() == false || desk->any_null() >= 0)
 			{
@@ -477,7 +485,9 @@ namespace dooqu_server
 		//当前游戏桌子的地主已经决定
 		void ddz_plugin::on_game_landlord(ddz_desk* desk, game_client* landlord, int verifi_code)
 		{
+			thread_status::log("start->ddz_plugin::on_game_landlord.desk_status");
 			boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+			thread_status::log("end->ddz_plugin::on_game_landlord.desk_status");
 
 			//	game_client* landlord = (game_client*)landlord_;
 
@@ -831,8 +841,11 @@ namespace dooqu_server
 
 			if (last_desk != NULL)
 			{
+				thread_status::log("start->ddz_plugin::on_join_desk_handle.desk_status");
 				//记得上锁
 				boost::recursive_mutex::scoped_lock lock(last_desk->status_mutex());
+				thread_status::log("end->ddz_plugin::on_join_desk_handle.desk_status");
+
 				this->on_client_leave_desk(client, last_desk, service_error::CLIENT_EXIT);
 			}
 
@@ -907,10 +920,10 @@ namespace dooqu_server
 			//如果玩家还没加入到任何桌子，返回
 			if (desk == NULL)
 				return;
-
+			thread_status::log("start->ddz_plugin::on_client_ready_handle.desk_status");
 			//加锁
 			boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
-
+			thread_status::log("end->ddz_plugin::on_client_ready_handle.desk_status");
 			if (desk->is_running())
 				return;
 
@@ -1155,8 +1168,9 @@ namespace dooqu_server
 			ddz_desk* desk = game_info->get_desk();
 			if (desk == NULL)
 				return;
-
+			thread_status::log("start->ddz_plugin::on_client_bid_handle.desk_status");
 			boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+			thread_status::log("end->ddz_plugin::on_client_bid_handle.desk_status");
 			this->on_client_bid(client, desk, is_bid);
 		}
 
@@ -1183,8 +1197,10 @@ namespace dooqu_server
 
 			if (desk == NULL)
 				return;
-
+			thread_status::log("start->ddz_plugin::on_client_card_handle.desk_status");
 			boost::recursive_mutex::scoped_lock lock(desk->status_mutex());
+			thread_status::log("end->ddz_plugin::on_client_card_handle.desk_status");
+
 			if (desk->is_running() == false || desk->landlord_ == NULL)
 			{
 				return;

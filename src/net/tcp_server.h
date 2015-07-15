@@ -34,6 +34,7 @@ namespace dooqu_server
 		typedef std::vector<boost::thread*> worker_threads;
 
 
+
 		class tcp_server : boost::noncopyable
 		{
 		protected:
@@ -50,6 +51,7 @@ namespace dooqu_server
 			bool is_accepting_;
 			thread_status_map threads_status_;
 			worker_threads worker_threads_;
+
 
 			void create_worker_thread();
 			void start_accept();
@@ -68,6 +70,24 @@ namespace dooqu_server
 			io_service& get_io_service(){ return this->io_service_; };
 			io_service& get_io_service_for_unload(){ return this->io_service_for_unload_; }
 			thread_status_map* threads_status(){ return &this->threads_status_; }
+			void tick_count_threads(){
+ for (int i = 0; i < this->worker_threads_.size();i++)
+ {
+	 this->io_service_.post(boost::bind(&tcp_server::update_curr_thread, this));
+ }
+			}
+
+			void update_curr_thread()
+			{
+				thread_status_map::iterator curr_thread_pair = this->threads_status()->find(boost::this_thread::get_id());
+
+				if (curr_thread_pair != this->threads_status()->end())
+				{
+					curr_thread_pair->second->restart();
+
+					printf("post update at thread: %d\n", boost::this_thread::get_id());
+				}
+			}
 			void start();
 			void stop();
 			void stop_accept();

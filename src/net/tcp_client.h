@@ -51,6 +51,8 @@ lock(data_sequence_lock_);
 #include <boost/pool/singleton_pool.hpp>
 #include <boost/noncopyable.hpp>
 #include "service_error.h"
+#include "threads_lock_status.h"
+
 
 namespace dooqu_server
 {
@@ -132,7 +134,10 @@ namespace dooqu_server
 		class tcp_client : boost::noncopyable
 		{
 		public:
-			enum{ MAX_BUFFER_SIZE = 65 , MAX_BUFFER_SEQUENCE_SIZE = 16, MAX_BUFFER_SIZE_DOUBLE_TIMES = 4};
+			enum{ MAX_BUFFER_SIZE = 65 , 
+				MAX_BUFFER_SEQUENCE_SIZE = 16, 
+				MAX_BUFFER_SIZE_DOUBLE_TIMES = 4};
+
 		protected:
 			//状态锁
 

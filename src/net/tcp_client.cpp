@@ -1,5 +1,6 @@
 #include "tcp_client.h"
 #include "tcp_server.h"
+#include "threads_lock_status.h"
 
 namespace dooqu_server
 {
@@ -24,7 +25,9 @@ namespace dooqu_server
 
 		void tcp_client::read_from_client()
 		{
+			thread_status::log("start:read_from_client");
 			boost::recursive_mutex::scoped_lock lock(this->status_lock_);
+			thread_status::log("end:read_from_client");
 
 			if (this->available() == false)
 				return;
@@ -80,12 +83,15 @@ namespace dooqu_server
 
 		void tcp_client::write(const char* format, ...)
 		{
+			thread_status::log("start:tcp_write.status_lock_");
 			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+			thread_status::log("end:tcp_write.status_lock_");
 
 			if (this->available() == false)
 				return;
-
+			thread_status::log("start:tcp_write.send_buffer_lock_");
 			boost::recursive_mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
+			thread_status::log("start:tcp_write.send_buffer_lock_");
 
 			buffer_stream* curr_buffer = NULL;
 
@@ -154,16 +160,18 @@ namespace dooqu_server
 				return;
 			}
 
-
+			thread_status::log("start->tcp_client::send_handle.status_lock_");
 			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
-
+			thread_status::log("end->tcp_client::send_handle.status_lock_");
 			//这里考虑下极限情况，如果this已经被销毁？
 			if (this->available() == false)
 			{
 				return;
 			}
 
+			thread_status::log("start:tcp_write.send_buffer_lock_");
 			boost::recursive_mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
+			thread_status::log("end:tcp_write.send_buffer_lock_");
 
 			buffer_stream* curr_buffer = &this->send_buffer_sequence_.at(this->read_pos_);
 
@@ -199,13 +207,16 @@ namespace dooqu_server
 
 		void tcp_client::disconnect_when_io_end()
 		{
+			thread_status::log("start->tcp_client::disconnect_when_io_end.status_lock_");
 			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+			thread_status::log("end->tcp_client::disconnect_when_io_end.status_lock_");
 
 			if (this->available() == false)
 				return;
 
+			thread_status::log("start->tcp_client::disconnect_when_io_end.send_buffer_lock");
 			boost::recursive_mutex::scoped_lock buffer_lock(this->send_buffer_lock_);
-
+			thread_status::log("end->tcp_client::disconnect_when_io_end.send_buffer_lock");
 
 			if (this->read_pos_ != -1)
 			{
@@ -227,7 +238,9 @@ namespace dooqu_server
 
 		void tcp_client::disconnect()
 		{
+			thread_status::log("start->tcp_client::disconnect.status_lock_");
 			boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+			thread_status::log("start->tcp_client::disconnect.status_lock_");
 
 			if (this->available_)
 			{
