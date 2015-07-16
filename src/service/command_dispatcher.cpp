@@ -29,6 +29,8 @@ namespace dooqu_server
 
 		void command_dispatcher::on_client_data_received(game_client* client, size_t bytes_received)
 		{
+			client->active();
+
 			client->buffer_pos += bytes_received;
 
 			if (client->buffer_pos > tcp_client::MAX_BUFFER_SIZE)
@@ -36,6 +38,10 @@ namespace dooqu_server
 				//不建议使用client->disconnect/disconnect_when_io_end
 				//在on_error之后，会自动调用socket的close.
 				client->write("ERR %d%c", service_error::DATA_OUT_OF_BUFFER, NULL);
+
+				thread_status::log("start->game_client::on_date_received.status_lock_");
+				boost::recursive_mutex::scoped_lock status_lock(client->status_lock_);
+				thread_status::log("end->game_client::on_date_received.st");
 
 				client->available_ = false;
 
@@ -56,6 +62,10 @@ namespace dooqu_server
 					//那么在之后的检查中，判断需要对用户的离开进行处理，调用on_error进行清理，并离开大逻辑循环。
 					if (client->available() == false)
 					{
+						thread_status::log("start->game_client::on_date_received.status_lock_");
+						boost::recursive_mutex::scoped_lock status_lock(client->status_lock_);
+						thread_status::log("end->game_client::on_date_received.st");
+
 						client->on_error(NULL);
 						return;
 					}
@@ -72,6 +82,9 @@ namespace dooqu_server
 					{
 						if ((client->buffer_pos - cmd_start_pos) >= tcp_client::MAX_BUFFER_SIZE)
 						{
+							thread_status::log("start->game_client::on_date_received.status_lock_");
+							boost::recursive_mutex::scoped_lock status_lock(client->status_lock_);
+							thread_status::log("end->game_client::on_date_received.st");
 							client->write("ERR %d%c", service_error::DATA_OUT_OF_BUFFER, NULL);
 
 							client->available_ = false;
@@ -96,6 +109,10 @@ namespace dooqu_server
 				}
 			}
 
+			thread_status::log("start->game_client::on_date_received.status_lock_");
+			boost::recursive_mutex::scoped_lock status_lock(client->status_lock_);
+			thread_status::log("end->game_client::on_date_received.st");
+
 			if (client->available() == false)
 			{
 				//delete this;
@@ -112,8 +129,6 @@ namespace dooqu_server
 		void command_dispatcher::on_client_data(game_client* client, char* data)
 		{
 			boost::recursive_mutex::scoped_lock lock(client->commander_mutex_);
-
-			client->active();
 
 			client->commander_.reset(data);
 

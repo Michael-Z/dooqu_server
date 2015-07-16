@@ -33,11 +33,6 @@ namespace dooqu_server
 				//但是! 可能因为逻辑需要、在其他工作者线程上调用disconnect函数，所以必须要同步status；
 				//防止在这个代码片段的中间被其他线程disconnect掉
 
-				thread_status::log("start->game_client::on_date_received.status_lock_");
-				boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
-				thread_status::log("end->game_client::on_date_received.status_lock_");
-
-
 				if (!error)
 				{
 					if (this->cmd_dispatcher_ != NULL)
@@ -55,6 +50,11 @@ namespace dooqu_server
 				}
 				else
 				{
+
+					thread_status::log("start->game_client::on_date_received.status_lock_");
+					boost::recursive_mutex::scoped_lock status_lock(this->status_lock_);
+					thread_status::log("end->game_client::on_date_received.status_lock_");
+
 					printf("client.receive canceled:{%s}\n", error.message().c_str());
 					this->available_ = false;
 					this->on_error(service_error::CLIENT_NET_ERROR);
@@ -103,6 +103,10 @@ namespace dooqu_server
 
 		void game_client::simulate_on_command(char* command_data, bool is_const_string = true)
 		{
+
+			if (this->available() ==false || this->cmd_dispatcher_ == NULL)
+				return;
+
 			char* command_data_clone = NULL;
 
 			//如果是传入的是一个常量串，那么我们要重新生成一个可写的缓冲区
@@ -118,8 +122,6 @@ namespace dooqu_server
 			}
 
 			//加锁
-			boost::recursive_mutex::scoped_lock lock(this->commander_mutex_);
-
 			this->cmd_dispatcher_->simulate_client_data(this, command_data_clone);
 
 			if (is_const_string)

@@ -171,7 +171,6 @@ namespace dooqu_server
 
 		void game_plugin::on_update_timeout_clients()
 		{
-			return;
 			boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
 			for (game_client_map::iterator e = this->clients_.begin();
 				e != this->clients_.end();

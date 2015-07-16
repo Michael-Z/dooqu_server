@@ -25,9 +25,9 @@ namespace dooqu_server
 
 		void tcp_client::read_from_client()
 		{
-			thread_status::log("start:read_from_client");
-			boost::recursive_mutex::scoped_lock lock(this->status_lock_);
-			thread_status::log("end:read_from_client");
+			//thread_status::log("start:read_from_client");
+			//boost::recursive_mutex::scoped_lock lock(this->status_lock_);
+			//thread_status::log("end:read_from_client");
 
 			if (this->available() == false)
 				return;
@@ -256,7 +256,7 @@ namespace dooqu_server
 
 		void tcp_client::on_data_received(const boost::system::error_code& error, size_t bytes_received)
 		{
-			if (tcp_client::LOG_IO_DATA)
+			if (!error && tcp_client::LOG_IO_DATA && bytes_received)
 			{
 				tcp_client::CURR_RECE_TOTAL += (long)bytes_received;
 			}
