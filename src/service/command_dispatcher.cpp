@@ -31,6 +31,9 @@ namespace dooqu_server
 		{
 			client->active();
 
+			if (client->available_ == false)
+				return;
+
 			client->buffer_pos += bytes_received;
 
 			if (client->buffer_pos > tcp_client::MAX_BUFFER_SIZE)

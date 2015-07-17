@@ -154,8 +154,6 @@ namespace dooqu_server
 			command_dispatcher::on_client_command(client, command);
 
 
-			printf("CMD:%s->%s", command->name(), client->id());
-
 			{
 				using namespace dooqu_server::net;
 
@@ -213,7 +211,7 @@ namespace dooqu_server
 
 				this->on_unload();
 
-				
+
 				boost::recursive_mutex::scoped_lock lock(this->clients_lock_);
 
 				for (game_client_map::iterator curr_client_pair = this->clients_.begin();

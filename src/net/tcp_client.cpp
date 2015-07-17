@@ -181,10 +181,10 @@ namespace dooqu_server
 				read_pos_ = -1;
 				write_pos_ = 0;
 
-				while (this->send_buffer_sequence_.size() > 5)
-				{
-					this->send_buffer_sequence_.pop_back();
-				}
+				//while (this->send_buffer_sequence_.size() > 5)
+				//{
+				//	this->send_buffer_sequence_.pop_back();
+				//}
 			}
 			else
 			{

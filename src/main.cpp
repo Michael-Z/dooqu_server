@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		//	service.create_plugin(plane_game, curr_zone_id);
 		//}
 
-		for (int i = 0, j = 0, zone_id = 0; i < 5; i++)
+		for (int i = 0, j = 0, zone_id = 0; i < 20; i++)
 		{
 			char curr_game_id[30];
 			curr_game_id[sprintf(curr_game_id, "ddz_%d", i) + 1] = 0;
