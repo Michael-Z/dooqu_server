@@ -14,7 +14,7 @@ namespace dooqu_server
 			: ios(ios),
 			t_socket(ios),
 			send_buffer_sequence_(3, buffer_stream(MAX_BUFFER_SIZE)),
-			read_pos_(-1), write_pos_(0), 
+			read_pos_(-1), write_pos_(0),
 			buffer_pos(0),
 			available_(false)
 		{
@@ -100,7 +100,9 @@ namespace dooqu_server
 
 			if (ret == false)
 			{
-				this->disconnect();
+				//如果堆积了很多未发送成功的的消息，说明客户端网络状况已经不可到达。
+				this->available_ = false;
+				this->on_error(service_error::CLIENT_NET_ERROR);
 				return;
 			}
 

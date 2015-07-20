@@ -29,10 +29,10 @@ namespace dooqu_server
 
 		void command_dispatcher::on_client_data_received(game_client* client, size_t bytes_received)
 		{
-			client->active();
-
 			if (client->available_ == false)
 				return;
+
+			client->active();
 
 			client->buffer_pos += bytes_received;
 

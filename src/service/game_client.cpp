@@ -4,7 +4,7 @@ namespace dooqu_server
 {
 	namespace service
 	{
-		game_client::game_client(io_service& ios) : 
+		game_client::game_client(io_service& ios) :
 			tcp_client(ios),
 			game_info_(NULL),
 			cmd_dispatcher_(NULL),
@@ -80,7 +80,7 @@ namespace dooqu_server
 			if (this->cmd_dispatcher_ != NULL)
 			{
 				this->cmd_dispatcher_->dispatch_bye(this);
-			}			
+			}
 		}
 
 
@@ -104,7 +104,7 @@ namespace dooqu_server
 		void game_client::simulate_on_command(char* command_data, bool is_const_string = true)
 		{
 
-			if (this->available() ==false || this->cmd_dispatcher_ == NULL)
+			if (this->available() == false || this->cmd_dispatcher_ == NULL)
 				return;
 
 			char* command_data_clone = NULL;
