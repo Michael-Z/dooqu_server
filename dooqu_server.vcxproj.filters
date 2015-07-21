@@ -37,6 +37,15 @@
     <Filter Include="源文件\plane">
       <UniqueIdentifier>{629f1e42-6547-4b4a-972c-8e805fe6909f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\ask">
+      <UniqueIdentifier>{d9e0397e-db4b-4d96-9075-b280d500a3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ask">
+      <UniqueIdentifier>{2f1a7277-c65d-49d3-954b-f39940ae4363}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\data">
+      <UniqueIdentifier>{e57e5a05-8637-49da-a8bb-93a14edba37a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\net\tcp_client.h">
@@ -126,6 +135,15 @@
     <ClInclude Include="src\net\threads_lock_status.h">
       <Filter>头文件\net</Filter>
     </ClInclude>
+    <ClInclude Include="src\ask\ask_plugin.h">
+      <Filter>头文件\ask</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ask\questions.h">
+      <Filter>头文件\ask</Filter>
+    </ClInclude>
+    <ClInclude Include="src\data\mysql_connection_pool.h">
+      <Filter>头文件\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -175,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="src\service\game_service.cpp">
       <Filter>源文件\service</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ask\ask_plugin.cpp">
+      <Filter>源文件\ask</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

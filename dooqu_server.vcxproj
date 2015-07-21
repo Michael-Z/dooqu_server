@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ask\ask_plugin.h" />
+    <ClInclude Include="src\ask\questions.h" />
+    <ClInclude Include="src\data\mysql_connection_pool.h" />
     <ClInclude Include="src\ddz\ddz_desk.h" />
     <ClInclude Include="src\ddz\ddz_game_info.h" />
     <ClInclude Include="src\ddz\ddz_plugin.h" />
@@ -42,6 +45,7 @@
     <ClInclude Include="src\service\utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ask\ask_plugin.cpp" />
     <ClCompile Include="src\ddz\ddz_desk.cpp" />
     <ClCompile Include="src\ddz\ddz_game_info.cpp" />
     <ClCompile Include="src\ddz\ddz_plugin.cpp" />
@@ -93,11 +97,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>g:\boost_1_57_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>g:\boost_1_57_0\stage\lib;G:\MySQL Connector C++ 1.1.6\lib\opt\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>E:\boost_1_55_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>g:\boost_1_57_0\stage\lib;G:\MySQL Connector C++ 1.1.6\lib\opt\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,7 +110,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>g:\boost_1_57_0\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>g:\boost_1_57_0\;G:\MySQL Connector C++ 1.1.6\include\;G:\MySQL Connector C++ 1.1.6\include\cppconn\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/D__DEBUG__ %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -114,6 +118,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/force %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>mysqlcppconn.lib;mysqlcppconn-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>E:\boost_1_55_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>g:\boost_1_57_0\;G:\MySQL Connector C++ 1.1.6\include\;G:\MySQL Connector C++ 1.1.6\include\cppconn\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -133,6 +138,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>mysqlcppconn.lib;mysqlcppconn-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/force %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
