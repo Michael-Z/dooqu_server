@@ -135,14 +135,14 @@
     <ClInclude Include="src\net\threads_lock_status.h">
       <Filter>头文件\net</Filter>
     </ClInclude>
-    <ClInclude Include="src\ask\ask_plugin.h">
-      <Filter>头文件\ask</Filter>
-    </ClInclude>
     <ClInclude Include="src\ask\questions.h">
       <Filter>头文件\ask</Filter>
     </ClInclude>
     <ClInclude Include="src\data\mysql_connection_pool.h">
       <Filter>头文件\data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ask\ask_plugin.h">
+      <Filter>头文件\ask</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
