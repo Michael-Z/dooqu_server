@@ -1,6 +1,7 @@
 #ifndef __ASK_ZONE_H__
 #define __ASK_ZONE_H__
 
+#include <vector>
 #include "../service/game_zone.h"
 #include "questions.h"
 
@@ -32,7 +33,11 @@ namespace dooqu_server
 		public:
 			ask_zone(game_service* service, char* zone_id) : game_zone(service, zone_id)
 			{
+			}
 
+			void fill_questions(int count, vector<question*>** question_coll_to_fill)
+			{
+				this->questions_.get(count, question_coll_to_fill);
 			}
 		};
 	}
