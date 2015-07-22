@@ -2,8 +2,9 @@
 #define __ASK_PLUGIN__
 
 #include "../service/game_plugin.h"
+#include "ask_zone.h"
 
-namespace dooqu
+namespace dooqu_server
 {
 	namespace plugins
 	{

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ask\ask_plugin.h" />
+    <ClInclude Include="src\ask\ask_zone.h" />
     <ClInclude Include="src\ask\questions.h" />
     <ClInclude Include="src\data\mysql_connection_pool.h" />
     <ClInclude Include="src\ddz\ddz_desk.h" />
@@ -101,7 +102,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>g:\boost_1_57_0\stage\lib;G:\MySQL Connector C++ 1.1.6\lib\opt\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,8 +131,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>g:\boost_1_57_0\;G:\MySQL Connector C++ 1.1.6\include\;G:\MySQL Connector C++ 1.1.6\include\cppconn\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>g:\boost_1_57_0\;G:\mysql_connector\include\;G:\mysql_connector\include\cppconn\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>mysqlcppconn.lib;mysqlcppconn-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/force %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>G:\boost_1_57_0\stage\lib;G:\mysql_connector\lib\opt;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -144,6 +144,9 @@
     <ClInclude Include="src\ask\ask_plugin.h">
       <Filter>头文件\ask</Filter>
     </ClInclude>
+    <ClInclude Include="src\ask\ask_zone.h">
+      <Filter>头文件\ask</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

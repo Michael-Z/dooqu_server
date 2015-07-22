@@ -1,4 +1,4 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include <cstdio>
 #include <queue>
 #include <list>
@@ -29,16 +29,16 @@ using namespace boost::asio;
 
 #define SERVER_DEBUG_MODE
 /*
-1ã€ã€main thread: 1
+1¡¢¡¢main thread: 1
 
-2ã€io_service çº¿ç¨‹: cpu + 1
+2¡¢io_service Ïß³Ì: cpu + 1
 
-3ã€io_service's timer: 1
+3¡¢io_service's timer: 1
 
-4ã€game_zone's io_service thread; zone num * 1;
-5ã€game_zone's io_service timer zone_num * 1;
+4¡¢game_zone's io_service thread; zone num * 1;
+5¡¢game_zone's io_service timer zone_num * 1;
 
-6ã€http_request ä¼šåŠ¨æ€å¯åŠ¨çº¿ç¨‹ï¼Œæ— æ³•æ§åˆ¶ += 2
+6¡¢http_request »á¶¯Ì¬Æô¶¯Ïß³Ì£¬ÎŞ·¨¿ØÖÆ += 2
 */
 
 
@@ -49,20 +49,35 @@ inline void enable_mem_leak_check()
 #endif
 }
 
+#include "mysql_driver.h"
+#include "mysql_connection.h"
+#include "statement.h"
+#include <vector>
+void get_mysql()
+{
+	sql::Driver* driver = sql::mysql::get_driver_instance();
+
+	sql::Connection* connection = driver->connect("tcp://192.168.1.102:3306", "root", "12345678");
+	sql::Statement* state = connection->createStatement();
+
+	state->execute("use dooqu;");
+	state->execute("set names 'gbk'");
+
+	sql::ResultSet* result = state->executeQuery("select title from game_ask limit 10;");
+
+	while (result->next())
+	{
+		std::cout << result->getString(1) << endl;
+	}
+}
+
 
 int main(int argc, char* argv[])
 {
-
-
 	enable_mem_leak_check();
 
 	{
 		using namespace dooqu_server::plugins;
-
-		question_collection q;
-
-		q.fill();
-
 
 		dooqu_server::service::game_service service(8000);
 
@@ -72,7 +87,7 @@ int main(int argc, char* argv[])
 		//	curr_game_id[sprintf(curr_game_id, "plane_%d", i)] = 0;
 
 		//	char curr_game_title[60] = { 0 };
-		//	curr_game_title[sprintf(curr_game_title, "é£æœºå¤§æˆ˜æˆ¿é—´[%d]", i)] = 0;
+		//	curr_game_title[sprintf(curr_game_title, "·É»ú´óÕ½·¿¼ä[%d]", i)] = 0;
 
 		//	char curr_zone_id[30] = "zone_0";
 
@@ -182,7 +197,7 @@ int main(int argc, char* argv[])
 
 	printf("server object is recyled, press any key to exit.");
 	getchar();
-	
+
 
 	return 1;
 }
