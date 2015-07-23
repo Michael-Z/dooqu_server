@@ -148,7 +148,7 @@
       <Filter>头文件\ask</Filter>
     </ClInclude>
     <ClInclude Include="src\ask\ask_room.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\ask</Filter>
     </ClInclude>
     <ClInclude Include="src\ask\ask_room.h">
       <Filter>头文件\ask</Filter>
