@@ -17,10 +17,10 @@
 #include "service/game_zone.h"
 #include "service/command.h"
 #include "ddz/ddz_plugin.h"
-#include <boost/pool/pool.hpp>
-#include "service\post_monitor.h"
-#include "plane\plane_plugin.h"
-#include "ask\questions.h"
+#include "service/post_monitor.h"
+#include "plane/plane_plugin.h"
+#include "ask/ask_plugin.h"
+
 //#include "net\threads_lock_status.h"
 
 using namespace boost::asio;
@@ -49,27 +49,6 @@ inline void enable_mem_leak_check()
 #endif
 }
 
-#include "mysql_driver.h"
-#include "mysql_connection.h"
-#include "statement.h"
-#include <vector>
-void get_mysql()
-{
-	sql::Driver* driver = sql::mysql::get_driver_instance();
-
-	sql::Connection* connection = driver->connect("tcp://192.168.1.102:3306", "root", "12345678");
-	sql::Statement* state = connection->createStatement();
-
-	state->execute("use dooqu;");
-	state->execute("set names 'gbk'");
-
-	sql::ResultSet* result = state->executeQuery("select title from game_ask limit 10;");
-
-	while (result->next())
-	{
-		std::cout << result->getString(1) << endl;
-	}
-}
 
 
 int main(int argc, char* argv[])
@@ -112,6 +91,10 @@ int main(int argc, char* argv[])
 			dooqu_server::ddz::ddz_plugin* curr_plugin = new dooqu_server::ddz::ddz_plugin(&service, curr_game_id, curr_game_id, 2000, 100, 15, 21000);
 			service.create_plugin(curr_plugin, curr_zone_id);
 		}
+
+		dooqu_server::plugins::ask_plugin* ask_plugin = new dooqu_server::plugins::ask_plugin(&service, "ask_0", "¿ªÐÄ´Çµä");
+
+		service.create_plugin(ask_plugin, "ask_zone_0");
 
 		service.start();
 		printf("please input the service command:\n");

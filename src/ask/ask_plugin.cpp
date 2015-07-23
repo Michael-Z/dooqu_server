@@ -6,7 +6,14 @@ namespace dooqu_server
 	{
 		void ask_plugin::on_load()
 		{
+			vector <question*> questions;
 
+			((ask_zone*)this->zone_)->fill_questions(10, &questions);
+
+			for (int i = 0; i < questions.size(); i++)
+			{
+				printf("%s\n", questions.at(i)->get_title());
+			}
 		}
 
 		void ask_plugin::on_unload()

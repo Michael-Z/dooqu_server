@@ -60,26 +60,37 @@ namespace dooqu_server
 		
 			vector<question*> questions_;
 			boost::mutex state_lock_;
+
 			
 		public:
-			question_collection() : questions_()
+			question_collection() : questions_(0)
 			{
 				
 			}
 
-			void get(int random_size, vector<question*>** questions_to_fill)
+			void get(int random_size, vector<question*>* questions_to_fill)
 			{
-				if (questions_to_fill == NULL || *questions_to_fill == NULL)
+				if (questions_to_fill == NULL || this->questions_.size() == 0)
 					return;
 
 				boost::mutex::scoped_lock lock(state_lock_);
 
-				std::random_shuffle(this->questions_.begin(), this->questions_.end());
+				std::set<int> find_indexs;
 
-				for (int i = 0; i < random_size; i++)
+				int find_count = 0;
+
+				while (find_count < random_size)
 				{
-					(*questions_to_fill)->push_back(this->questions_.at(i));
-				}					
+					int pos_i = rand() % this->questions_.size();
+
+					if (find_indexs.find(pos_i) == find_indexs.end())
+					{
+						++find_count;
+						find_indexs.insert(pos_i);
+
+						questions_to_fill->push_back(this->questions_.at(pos_i));
+					}
+				}
 			}
 
 			void fill()
@@ -92,17 +103,35 @@ namespace dooqu_server
 				sql::ResultSet* result = NULL;
 				try
 				{
-					sql::Connection* connection = sql::mysql::get_driver_instance()->connect("tcp://192.168.1.102:3306", "root", "12345678");
+					connection = sql::mysql::get_driver_instance()->connect("tcp://127.0.0.1:3306", "root", "12345678");
 					state = connection->createStatement();
 
 					state->execute("use dooqu;");
 					state->execute("set names 'gbk'");
 
+					int size = 0;
+
+					result = state->executeQuery("select count(1) from game_ask;");
+
+					if (result->next())
+					{
+						size = result->getInt(1);
+					}
+
+					delete result;
+
+					printf("this->questions.size=%d\n", this->questions_.size());
+
+					this->questions_.resize(size);
+
+					printf("this->questions.size=%d\n", this->questions_.size());
+
 					result = state->executeQuery("select `title`, `option_a`, `option_b`, `option_c`, `option_d`, `option_e`, `key` from game_ask;");
 
+					int data_size = 0;
 					while (result->next())
 					{
-						question* q = new question();
+						question* q = new question();					
 
 						q->set_title(result->getString(1)->c_str());
 						q->set_option(0, result->getString(2)->c_str());
@@ -113,8 +142,16 @@ namespace dooqu_server
 
 						q->key_index_ = result->getInt(7);
 
-						this->questions_.push_back(q);
+						if (data_size < size)
+						{
+							this->questions_[data_size] = q;
+						}
+						else
+						{
+							this->questions_.push_back(q);
+						}
 
+						data_size++;
 					}
 				}
 				catch (sql::SQLException& ex)
@@ -126,6 +163,8 @@ namespace dooqu_server
 				delete state;
 				connection->close();
 				delete connection;
+
+				printf("ask_zone load date completed.\n");
 			}
 
 			void clear()

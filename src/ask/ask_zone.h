@@ -35,7 +35,7 @@ namespace dooqu_server
 			{
 			}
 
-			void fill_questions(int count, vector<question*>** question_coll_to_fill)
+			void fill_questions(int count, vector<question*>* question_coll_to_fill)
 			{
 				this->questions_.get(count, question_coll_to_fill);
 			}

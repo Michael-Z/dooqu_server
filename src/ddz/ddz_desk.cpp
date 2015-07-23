@@ -193,8 +193,17 @@ namespace dooqu_server
 
 		void ddz_desk::allocate_pokers()
 		{
-			std::srand((unsigned)time(NULL));
-			std::random_shuffle(this->desk_pokers_, this->desk_pokers_ + 54);
+			int pos_i = 54;
+			int rnd_i;
+			const char* temp;
+
+			while (--pos_i)
+			{
+				rnd_i = rand() % (pos_i + 1);
+				temp = this->desk_pokers_[pos_i];
+				this->desk_pokers_[pos_i] = this->desk_pokers_[rnd_i];
+				this->desk_pokers_[rnd_i] = temp;
+			}
 
 			for (int poker_index = 0; poker_index < 51; ++poker_index)
 			{

@@ -28,6 +28,12 @@ namespace dooqu_server
 			void on_client_leave(game_client* client, int code);
 
 			game_zone* on_create_zone(char* zone_id);
+
+		public:
+			ask_plugin(game_service* service, char* game_id, char* title) : game_plugin(service, game_id, title)
+			{
+
+			}
 		};
 	}
 }

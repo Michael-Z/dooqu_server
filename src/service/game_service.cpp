@@ -62,6 +62,8 @@ namespace dooqu_server
 
 		void game_service::on_init()
 		{
+			std::srand((unsigned)time(NULL));
+
 			this->regist_handle("LOG", make_handler(game_service::client_login_handle));
 			this->regist_handle("RLG", make_handler(game_service::robot_login_handle));
 
