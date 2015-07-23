@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="src\ask\ask_plugin.h" />
     <ClInclude Include="src\ask\ask_room.h" />
+    <ClInclude Include="src\ask\ask_room.h" />
     <ClInclude Include="src\ask\ask_zone.h" />
     <ClInclude Include="src\ask\questions.h" />
     <ClInclude Include="src\data\mysql_connection_pool.h" />
